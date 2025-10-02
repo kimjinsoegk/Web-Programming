@@ -86,7 +86,8 @@ const State = {
     ui: {
         activeSection: 'dashboard',
         editMode: false
-    }
+    },
+    pendingSchedules: [] // 임시 저장된 스케줄들
 };
 
 // ===== 이벤트 관리 모듈 =====
@@ -237,15 +238,15 @@ const ScheduleService = {
             throw new Error(errors.join('\n'));
         }
         
-        const schedules = ScheduleService.getAll();
-        
         // 시간 충돌 검사 (수정하는 경우 기존 스케줄 제외)
-        const conflictCheck = schedules.filter(s => s.id !== schedule.id);
-        const conflict = ScheduleService.checkTimeConflict(schedule, conflictCheck);
+        const conflicts = ScheduleService.checkConflicts(schedule.day, schedule.start, schedule.end, schedule.id);
         
-        if (conflict) {
+        if (conflicts.length > 0) {
+            const conflict = conflicts[0];
             throw new Error(`시간이 겹치는 수업이 있습니다: ${conflict.name} (${conflict.day} ${conflict.start}-${conflict.end})`);
         }
+        
+        const schedules = ScheduleService.getAll();
         
         const existingIndex = schedules.findIndex(s => s.id === schedule.id);
         
@@ -272,10 +273,15 @@ const ScheduleService = {
         return Storage.clear(CONFIG.STORAGE_KEYS.SCHEDULE);
     },
     
-    checkTimeConflict: (newSchedule, existingSchedules) => {
-        return existingSchedules.find(existing => {
+    // 시간 충돌 검사 함수 (배열 반환)
+    checkConflicts: (day, startTime, endTime, excludeId = null) => {
+        const schedules = ScheduleService.getAll();
+        const conflicts = schedules.filter(schedule => {
+            // 제외할 ID가 있으면 해당 스케줄은 제외
+            if (excludeId && schedule.id === excludeId) return false;
+            
             // 같은 요일이 아니면 충돌 없음
-            if (existing.day !== newSchedule.day) return false;
+            if (schedule.day !== day) return false;
             
             // 시간을 분으로 변환해서 비교
             const getMinutes = (timeStr) => {
@@ -283,14 +289,27 @@ const ScheduleService = {
                 return hours * 60 + minutes;
             };
             
-            const newStart = getMinutes(newSchedule.start);
-            const newEnd = getMinutes(newSchedule.end);
-            const existingStart = getMinutes(existing.start);
-            const existingEnd = getMinutes(existing.end);
+            const newStart = getMinutes(startTime);
+            const newEnd = getMinutes(endTime);
+            const existingStart = getMinutes(schedule.start);
+            const existingEnd = getMinutes(schedule.end);
             
             // 시간 겹침 검사
             return (newStart < existingEnd && newEnd > existingStart);
         });
+        
+        return conflicts;
+    },
+    
+    // 레거시 호환용 함수 (단일 충돌 반환)
+    checkTimeConflict: (newSchedule, existingSchedules) => {
+        const conflicts = ScheduleService.checkConflicts(
+            newSchedule.day, 
+            newSchedule.start, 
+            newSchedule.end, 
+            newSchedule.id
+        );
+        return conflicts.length > 0 ? conflicts[0] : null;
     }
 };
 
@@ -513,11 +532,6 @@ const Components = {
             
             const schedules = ScheduleService.getAll();
             
-            if (schedules.length === 0) {
-                grid.innerHTML = '<div class="empty-message">등록된 시간표가 없습니다.</div>';
-                return;
-            }
-            
             // 현재 요일 가져오기
             const today = new Date();
             const currentDay = ['일', '월', '화', '수', '목', '금', '토'][today.getDay()];
@@ -680,11 +694,6 @@ const Components = {
             if (!grid) return;
             
             const schedules = ScheduleService.getAll();
-            
-            if (schedules.length === 0) {
-                grid.innerHTML = '<div class="empty-message">등록된 수업이 없습니다. 위 폼에서 수업을 추가해보세요.</div>';
-                return;
-            }
 
             const timeSlots = Components.Schedule.generateTimeSlots();
             const days = ['월', '화', '수', '목', '금', '토', '일'];
@@ -813,11 +822,6 @@ const Components = {
             if (!container) return;
             
             const schedules = ScheduleService.getAll();
-            
-            if (schedules.length === 0) {
-                container.innerHTML = '<div class="schedule-empty">등록된 시간표가 없습니다.</div>';
-                return;
-            }
             
             // 요일별로 정렬
             const dayOrder = ['월', '화', '수', '목', '금', '토', '일'];
@@ -1145,29 +1149,39 @@ const App = {
     },
     
     setupDayTimeSelection: () => {
-        // 각 요일 체크박스에 이벤트 리스너 추가
-        document.querySelectorAll('input[name="class-days"]').forEach(checkbox => {
-            EventManager.on(checkbox, 'change', (e) => {
-                const dayItem = e.target.closest('.day-time-item');
-                const timeInputs = dayItem.querySelector('.time-inputs');
-                
-                if (e.target.checked) {
-                    dayItem.classList.add('selected');
-                    timeInputs.style.display = 'block';
-                } else {
-                    dayItem.classList.remove('selected');
-                    timeInputs.style.display = 'none';
-                }
-            });
-        });
+        const dayCheckboxes = Utils.qsa('input[name="class-days"]');
+        let lastSelectedDays = []; // 이전에 선택된 요일들
         
-        // 요일 라벨 클릭으로도 체크박스 토글
-        document.querySelectorAll('.day-header').forEach(header => {
-            EventManager.on(header, 'click', (e) => {
-                if (e.target.tagName !== 'INPUT') {
-                    const checkbox = header.querySelector('input[name="class-days"]');
-                    checkbox.click();
+        // 시간 입력 필드들
+        const timeInputs = {
+            startHour: Utils.qs('#start-hour'),
+            startMin: Utils.qs('#start-min'),
+            endHour: Utils.qs('#end-hour'),
+            endMin: Utils.qs('#end-min')
+        };
+        
+        // 시간을 기본값으로 리셋하는 함수 (07:00 ~ 08:00)
+        const resetTimeInputs = () => {
+            timeInputs.startHour.value = '07';
+            timeInputs.startMin.value = '00';
+            timeInputs.endHour.value = '08';
+            timeInputs.endMin.value = '00';
+        };
+        
+        // 체크박스 변경 이벤트
+        dayCheckboxes.forEach(checkbox => {
+            EventManager.on(checkbox, 'change', () => {
+                const currentSelectedDays = dayCheckboxes.filter(cb => cb.checked).map(cb => cb.value);
+                
+                // 새로운 요일이 추가되었는지 확인
+                const newlySelected = currentSelectedDays.filter(day => !lastSelectedDays.includes(day));
+                
+                if (newlySelected.length > 0) {
+                    // 새로운 요일이 선택되면 시간 초기화
+                    resetTimeInputs();
                 }
+                
+                lastSelectedDays = [...currentSelectedDays];
             });
         });
     },
@@ -1241,55 +1255,68 @@ const App = {
         e.preventDefault();
         
         try {
-            // 선택된 요일들과 각각의 시간 가져오기
+            const className = Utils.qs('#class-name')?.value?.trim();
+            const location = Utils.qs('#location')?.value?.trim();
+            const color = Utils.qs('#class-color')?.value || CONFIG.DEFAULT_COLORS.SCHEDULE;
+            
+            if (!className) {
+                throw new Error('수업명을 입력해주세요.');
+            }
+            
+            // 선택된 요일들 가져오기
             const selectedDays = Array.from(document.querySelectorAll('input[name="class-days"]:checked'))
                 .map(cb => cb.value);
             
             if (selectedDays.length === 0) {
-                throw new Error('요일을 하나 이상 선택해주세요.');
+                throw new Error('요일을 선택해주세요.');
             }
             
-            const baseFormData = {
-                name: Utils.qs('#class-name')?.value?.trim(),
-                location: Utils.qs('#location')?.value?.trim(),
-                color: Utils.qs('#class-color')?.value || CONFIG.DEFAULT_COLORS.SCHEDULE
-            };
+            // 현재 입력된 시간 가져오기
+            const startHour = Utils.qs('#start-hour')?.value || '07';
+            const startMin = Utils.qs('#start-min')?.value || '00';
+            const endHour = Utils.qs('#end-hour')?.value || '08';
+            const endMin = Utils.qs('#end-min')?.value || '00';
             
-            // 각 요일에 대해 개별 시간으로 시간표 저장
+            const startTime = `${startHour}:${startMin}`;
+            const endTime = `${endHour}:${endMin}`;
+            
+            // 시간 중복 검사
+            for (const day of selectedDays) {
+                const conflicts = ScheduleService.checkConflicts(day, startTime, endTime);
+                if (conflicts.length > 0) {
+                    throw new Error(`${day}요일 ${startTime}-${endTime} 시간에 이미 '${conflicts[0].name}' 수업이 있습니다.`);
+                }
+            }
+            
+            // 모든 선택된 요일에 동일한 시간으로 스케줄 저장
             const savedSchedules = [];
             for (const day of selectedDays) {
-                const startHour = document.querySelector(`select[name="start-hour-${day}"]`)?.value || '09';
-                const startMin = document.querySelector(`select[name="start-min-${day}"]`)?.value || '00';
-                const endHour = document.querySelector(`select[name="end-hour-${day}"]`)?.value || '10';
-                const endMin = document.querySelector(`select[name="end-min-${day}"]`)?.value || '00';
-                
-                const formData = { 
-                    ...baseFormData, 
-                    day,
-                    start: `${startHour}:${startMin}`,
-                    end: `${endHour}:${endMin}`
+                const formData = {
+                    name: className,
+                    location: location,
+                    color: color,
+                    day: day,
+                    start: startTime,
+                    end: endTime
                 };
                 
                 const schedule = ScheduleService.save(formData);
                 savedSchedules.push(schedule);
             }
             
-            e.target.reset();
-            // 모든 요일 체크박스 해제 및 시간 입력창 숨기기
-            document.querySelectorAll('input[name="class-days"]').forEach(cb => {
-                cb.checked = false;
-                const dayItem = cb.closest('.day-time-item');
-                if (dayItem) {
-                    dayItem.classList.remove('selected');
-                    const timeInputs = dayItem.querySelector('.time-inputs');
-                    if (timeInputs) timeInputs.style.display = 'none';
-                }
-            });
+            // 체크박스만 해제 (수업명, 장소는 유지)
+            document.querySelectorAll('input[name="class-days"]').forEach(cb => cb.checked = false);
+            
+            // 시간을 기본값으로 리셋
+            Utils.qs('#start-hour').value = '07';
+            Utils.qs('#start-min').value = '00';
+            Utils.qs('#end-hour').value = '08';
+            Utils.qs('#end-min').value = '00';
             
             App.refreshAll();
             
             if (savedSchedules.length === 1) {
-                App.showSuccess(`'${savedSchedules[0].name}' 수업이 추가되었습니다.`);
+                App.showSuccess(`'${savedSchedules[0].name}' 수업이 ${selectedDays[0]}요일에 추가되었습니다.`);
             } else {
                 App.showSuccess(`'${savedSchedules[0].name}' 수업이 ${savedSchedules.length}개 요일에 추가되었습니다.`);
             }

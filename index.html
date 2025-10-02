@@ -77,407 +77,88 @@
             
             <form id="schedule-form" class="form">
                 <input type="text" id="class-name" placeholder="수업명" required>
-                <input type="text" id="location" placeholder="장소 (선택)">
-                <label class="color-label">블록 색상: <input type="color" id="class-color" value="#2b6ef6"></label>
                 
-                <!-- 요일별 개별 시간 설정 -->
-                <div class="day-time-selection">
-                    <label>요일 및 시간 설정:</label>
-                    <div class="day-time-list">
-                        <div class="day-time-item" data-day="월">
-                            <div class="day-header">
-                                <input type="checkbox" name="class-days" value="월" id="day-월">
-                                <label for="day-월" class="day-label">월요일</label>
-                            </div>
-                            <div class="time-inputs" style="display: none;">
-                                <div class="time-row">
-                                    <label>시작:</label>
-                                    <select name="start-hour-월">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09" selected>09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="start-min-월">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                    
-                                    <label>종료:</label>
-                                    <select name="end-hour-월">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09">09</option>
-                                        <option value="10" selected>10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="end-min-월">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="day-time-item" data-day="화">
-                            <div class="day-header">
-                                <input type="checkbox" name="class-days" value="화" id="day-화">
-                                <label for="day-화" class="day-label">화요일</label>
-                            </div>
-                            <div class="time-inputs" style="display: none;">
-                                <div class="time-row">
-                                    <label>시작:</label>
-                                    <select name="start-hour-화">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09" selected>09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="start-min-화">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                    
-                                    <label>종료:</label>
-                                    <select name="end-hour-화">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09">09</option>
-                                        <option value="10" selected>10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="end-min-화">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 나머지 요일들도 동일한 구조 -->
-                        <div class="day-time-item" data-day="수">
-                            <div class="day-header">
-                                <input type="checkbox" name="class-days" value="수" id="day-수">
-                                <label for="day-수" class="day-label">수요일</label>
-                            </div>
-                            <div class="time-inputs" style="display: none;">
-                                <div class="time-row">
-                                    <label>시작:</label>
-                                    <select name="start-hour-수">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09" selected>09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="start-min-수">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                    
-                                    <label>종료:</label>
-                                    <select name="end-hour-수">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09">09</option>
-                                        <option value="10" selected>10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="end-min-수">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="day-time-item" data-day="목">
-                            <div class="day-header">
-                                <input type="checkbox" name="class-days" value="목" id="day-목">
-                                <label for="day-목" class="day-label">목요일</label>
-                            </div>
-                            <div class="time-inputs" style="display: none;">
-                                <div class="time-row">
-                                    <label>시작:</label>
-                                    <select name="start-hour-목">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09" selected>09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="start-min-목">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                    
-                                    <label>종료:</label>
-                                    <select name="end-hour-목">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09">09</option>
-                                        <option value="10" selected>10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="end-min-목">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="day-time-item" data-day="금">
-                            <div class="day-header">
-                                <input type="checkbox" name="class-days" value="금" id="day-금">
-                                <label for="day-금" class="day-label">금요일</label>
-                            </div>
-                            <div class="time-inputs" style="display: none;">
-                                <div class="time-row">
-                                    <label>시작:</label>
-                                    <select name="start-hour-금">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09" selected>09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="start-min-금">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                    
-                                    <label>종료:</label>
-                                    <select name="end-hour-금">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09">09</option>
-                                        <option value="10" selected>10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="end-min-금">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="day-time-item" data-day="토">
-                            <div class="day-header">
-                                <input type="checkbox" name="class-days" value="토" id="day-토">
-                                <label for="day-토" class="day-label">토요일</label>
-                            </div>
-                            <div class="time-inputs" style="display: none;">
-                                <div class="time-row">
-                                    <label>시작:</label>
-                                    <select name="start-hour-토">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09" selected>09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="start-min-토">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                    
-                                    <label>종료:</label>
-                                    <select name="end-hour-토">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09">09</option>
-                                        <option value="10" selected>10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="end-min-토">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="day-time-item" data-day="일">
-                            <div class="day-header">
-                                <input type="checkbox" name="class-days" value="일" id="day-일">
-                                <label for="day-일" class="day-label">일요일</label>
-                            </div>
-                            <div class="time-inputs" style="display: none;">
-                                <div class="time-row">
-                                    <label>시작:</label>
-                                    <select name="start-hour-일">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09" selected>09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="start-min-일">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                    
-                                    <label>종료:</label>
-                                    <select name="end-hour-일">
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09">09</option>
-                                        <option value="10" selected>10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    :
-                                    <select name="end-min-일">
-                                        <option value="00">00</option>
-                                        <option value="30">30</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                <!-- 간단한 요일 선택 -->
+                <div class="day-selection">
+                    <label>요일 선택:</label>
+                    <div class="day-checkboxes">
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="class-days" value="월"> 월
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="class-days" value="화"> 화
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="class-days" value="수"> 수
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="class-days" value="목"> 목
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="class-days" value="금"> 금
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="class-days" value="토"> 토
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="class-days" value="일"> 일
+                        </label>
                     </div>
                 </div>
+                
+                <!-- 시간 입력 -->
+                <div class="time-inputs">
+                    <label class="time-select">시작: 
+                        <select id="start-hour">
+                            <option value="07" selected>07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                        </select>
+                        :
+                        <select id="start-min">
+                            <option value="00" selected>00</option>
+                            <option value="30">30</option>
+                        </select>
+                    </label>
+
+                    <label class="time-select">종료: 
+                        <select id="end-hour">
+                            <option value="07">07</option>
+                            <option value="08" selected>08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                        </select>
+                        :
+                        <select id="end-min">
+                            <option value="00" selected>00</option>
+                            <option value="30">30</option>
+                        </select>
+                    </label>
+                </div>
+                
+                <input type="text" id="location" placeholder="장소 (선택)">
+                <label class="color-label">블록 색상: <input type="color" id="class-color" value="#2b6ef6"></label>
                 
                 <button type="submit">추가</button>
                 <button type="button" id="clear-schedules" class="danger">전체 삭제</button>
