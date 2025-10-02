@@ -686,27 +686,36 @@ nav{display:flex; gap:8px}
 
 /* 요일별 개별 시간 설정 스타일 */
 .day-time-selection {
-    margin: 16px 0;
+    margin: 12px 0;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
 }
 
 .day-time-selection > label {
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     font-weight: 500;
     color: #374151;
+    font-size: 14px;
 }
 
 .day-time-list {
     display: grid;
-    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    max-height: 350px;
+    overflow-y: auto;
 }
 
 .day-time-item {
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 12px;
+    border-radius: 6px;
+    padding: 8px;
     background: #f8fafc;
     transition: all 0.2s;
+    font-size: 13px;
 }
 
 .day-time-item.selected {
@@ -717,8 +726,15 @@ nav{display:flex; gap:8px}
 .day-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     cursor: pointer;
+    padding: 2px;
+}
+
+.day-header input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    margin: 0;
 }
 
 .day-label {
@@ -726,33 +742,36 @@ nav{display:flex; gap:8px}
     color: #374151;
     cursor: pointer;
     user-select: none;
+    font-size: 13px;
+    flex: 1;
 }
 
 .time-inputs {
-    margin-top: 12px;
-    padding-top: 12px;
+    margin-top: 8px;
+    padding-top: 8px;
     border-top: 1px solid #e5e7eb;
 }
 
 .time-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     flex-wrap: wrap;
 }
 
 .time-row label {
-    font-size: 14px;
+    font-size: 12px;
     color: #6b7280;
-    min-width: 40px;
+    min-width: 30px;
 }
 
 .time-row select {
-    padding: 4px 8px;
+    padding: 2px 4px;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 14px;
+    border-radius: 3px;
+    font-size: 12px;
     background: white;
+    width: 45px;
 }
 
 /* 모달 스타일 */
