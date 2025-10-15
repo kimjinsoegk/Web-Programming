@@ -1,3 +1,113 @@
+/* ============================================================================
+   SCHOOL LIFE HELPER - 아이콘 시스템 완전 가이드
+   ============================================================================
+   
+   📚 아이콘 라이브러리: Remix Icon v4.3.0
+   CDN: https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css
+   패턴: ri-{icon-name}-line (모든 아이콘 선형 스타일로 일관성 유지)
+   
+   ============================================================================
+   📐 아이콘 크기 체계 (Tailwind 기준)
+   ============================================================================
+   
+   크기          rem값    px값    사용 위치
+   ─────────────────────────────────────────────────────────────────────────
+   text-lg       1.125rem  18px   • 액션 버튼 (편집/삭제)
+   text-xl       1.25rem   20px   • 헤더 아이콘 (알림, 프로필)
+                                  • 대시보드 카드 제목
+   text-2xl      1.5rem    24px   • 기능 카드 아이콘
+                                  • 추가 버튼 아이콘
+   custom        1.75rem   28px   • 헤더 로고
+   custom        2rem      32px   • 섹션 타이틀
+   
+   ============================================================================
+   🎨 색상 시스템 (Tailwind 정확한 색상 코드)
+   ============================================================================
+   
+   상태/용도              색상 코드    Tailwind 클래스
+   ─────────────────────────────────────────────────────────────────────────
+   기본 비활성            #9CA3AF     text-gray-400
+   호버 일반              #4B5563     text-gray-600
+   호버 편집 (주요)       #4F46E5     text-indigo-600
+   호버 삭제 (위험)       #DC2626     text-red-600
+   
+   ============================================================================
+   📦 기능 카드 아이콘 컨테이너 (48px × 48px)
+   ============================================================================
+   
+   기능          배경색(100단계)  아이콘색(600단계)  Tailwind 클래스
+   ─────────────────────────────────────────────────────────────────────────
+   시간표        #DBEAFE         #2563EB           bg-blue-100 / text-blue-600
+   과제          #D1FAE5         #059669           bg-green-100 / text-green-600
+   필기          #E9D5FF         #9333EA           bg-purple-100 / text-purple-600
+   클럽          #FED7AA         #EA580C           bg-orange-100 / text-orange-600
+   
+   컨테이너 속성:
+   - 크기: 48px × 48px (w-12 h-12 = 3rem × 3rem)
+   - 모서리: 8px (rounded-lg = 0.5rem)
+   - 정렬: flex items-center justify-center
+   - 하단 여백: 16px (mb-4 = 1rem)
+   
+   호버 효과:
+   - 배경색: 100단계 → 600단계로 변경
+   - 아이콘 색: 600단계 → white로 변경
+   - 전환: transition all 0.2s ease
+   
+   ============================================================================
+   🗺️ 아이콘 위치별 상세 분석
+   ============================================================================
+   
+   1. 헤더 영역 (우측 상단)
+   ─────────────────────────────────────────────────────────────────────────
+   • 알림 아이콘:      ri-notification-line (20px)
+   • 프로필 아이콘:    ri-user-line (20px)
+   • 패딩:            8px (p-2)
+   • 간격:            16px (space-x-4)
+   • 색상:            #9CA3AF → hover: #4B5563
+   
+   2. 네비게이션 버튼
+   ─────────────────────────────────────────────────────────────────────────
+   • 시간표:          ri-calendar-line (18px)
+   • 과제:            ri-task-line (18px)
+   • 노트:            ri-book-2-line (18px)
+   • 타이머:          ri-timer-line (18px)
+   • 간격:            8px (gap-8)
+   
+   3. 기능 카드 (대시보드 상단)
+   ─────────────────────────────────────────────────────────────────────────
+   • 시간표 관리:     ri-calendar-line (24px, 파랑 테마)
+   • 과제 추적:       ri-task-line (24px, 초록 테마)
+   • 필기 노트:       ri-book-2-line (24px, 보라 테마)
+   • 클럽 활동:       ri-group-line (24px, 주황 테마)
+   
+   4. 대시보드 카드 제목
+   ─────────────────────────────────────────────────────────────────────────
+   • 오늘의 시간표:   ri-calendar-check-line (20px)
+   • 다가오는 과제:   ri-file-list-line (20px)
+   • 오늘 공부 시간:  ri-time-line (20px)
+   
+   5. 액션 버튼
+   ─────────────────────────────────────────────────────────────────────────
+   • 편집:            ri-edit-line (18px, hover: #4F46E5)
+   • 삭제:            ri-delete-bin-line (18px, hover: #DC2626)
+   • 추가:            ri-add-line (24px)
+   
+   ============================================================================
+   🔧 구현 규칙
+   ============================================================================
+   
+   필수 클래스 조합:
+   1. 아이콘 버튼:     p-2 text-gray-400 hover:text-{color} transition-colors
+   2. 컨테이너 있는 아이콘: w-12 h-12 bg-{color}-100 rounded-lg flex items-center justify-center
+   3. 호버 효과:       transition-colors (모든 인터랙티브 아이콘)
+   
+   접근성:
+   - 최소 클릭 영역: 44px × 44px (패딩 포함)
+   - 적절한 aria-label 제공
+   - 색상 대비비 WCAG 기준 충족
+   
+   ============================================================================ */
+
 /* 대시보드 스타일 개선 */
 .dashboard-grid {
     display: grid;
@@ -258,6 +368,35 @@
     --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ========================================
+   Remix Icon 아이콘 시스템 가이드
+   ======================================== 
+   
+   📐 아이콘 크기 체계:
+   - text-lg (18px): 액션 버튼 (편집/삭제)
+   - text-xl (20px): 헤더 아이콘, 대시보드 카드 제목
+   - text-2xl (24px): 기능 카드, 추가 버튼
+   - 28px: 헤더 로고
+   - 32px: 섹션 타이틀
+   
+   🎨 색상 체계:
+   - 기본: #9CA3AF (text-gray-400)
+   - 호버 일반: #4B5563 (text-gray-600)
+   - 호버 편집: #4F46E5 (text-indigo-600)
+   - 호버 삭제: #DC2626 (text-red-600)
+   
+   📦 기능 카드 컨테이너:
+   - 크기: 48px × 48px (w-12 h-12)
+   - 배경: 각 기능별 100 단계 색상
+   - 아이콘: 각 기능별 600 단계 색상
+   - 모서리: 8px (rounded-lg)
+   
+   🔧 사용 패턴:
+   - 모든 아이콘: ri-{name}-line (선형 스타일 일관성)
+   - 호버 효과: transition-colors (0.2s ease)
+   - 간격: space-x-4 (16px) 또는 gap-8 (8px)
+   ======================================== */
+
 /* 기본 리셋 및 공통 스타일 */
 * {
     box-sizing: border-box;
@@ -281,13 +420,14 @@ body {
     justify-content: space-between;
     align-items: center;
     background: white;
-    padding: 16px 32px;
+    padding: 16px 48px;
     box-shadow: var(--shadow-sm);
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
     z-index: 100;
     backdrop-filter: blur(10px);
+    gap: 32px;
 }
 
 .site-header h1 {
@@ -301,6 +441,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
 }
 
 .site-header h1 i {
@@ -312,44 +453,12 @@ body {
     transform: scale(1.02);
 }
 
-/* 헤더 액션 버튼 */
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.icon-btn {
-    padding: 8px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    font-size: 20px;
-    cursor: pointer;
-    border-radius: var(--radius-md);
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.icon-btn:hover {
-    background: var(--bg-secondary);
-    color: var(--primary);
-}
-
-/* 메인 네비게이션 개선 */
-.main-nav {
+/* 헤더 내 네비게이션 */
+.header-nav {
     display: flex;
     gap: 8px;
-    padding: 16px 32px;
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-}
-
-.main-nav::-webkit-scrollbar {
-    height: 4px;
+    flex: 1;
+    justify-content: center;
 }
 
 /* 네비게이션 버튼 */
@@ -363,7 +472,7 @@ nav {
     background: white;
     border: 1px solid var(--border);
     color: var(--text-secondary);
-    padding: 12px 24px;
+    padding: 10px 20px;
     border-radius: var(--radius-full);
     cursor: pointer;
     font-size: 14px;
@@ -376,7 +485,7 @@ nav {
 }
 
 .nav-btn i {
-    font-size: 18px;
+    font-size: 18px; /* text-lg: 1.125rem - 정확한 크기 */
 }
 
 .nav-btn:hover {
@@ -392,6 +501,36 @@ nav {
     color: white;
     border-color: var(--primary);
     box-shadow: var(--shadow-md);
+}
+
+/* 메인 네비게이션 (사용 안 함) */
+.main-nav {
+    display: none;
+}
+
+/* 헤더 액션 버튼 - Tailwind 스타일 정확히 적용 */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* space-x-4 */
+}
+
+.icon-btn {
+    padding: 8px; /* p-2 */
+    background: transparent;
+    border: none;
+    color: #9CA3AF; /* text-gray-400 */
+    font-size: 20px; /* text-xl: 1.25rem */
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: color 0.2s ease; /* transition-colors */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    color: #4B5563; /* hover:text-gray-600 */
 }
 
 /* 컨테이너 */
@@ -418,12 +557,226 @@ nav {
 }
 
 .section h2 i {
-    font-size: 32px;
+    font-size: 32px; /* 섹션 타이틀은 더 큰 아이콘 */
     color: var(--primary);
 }
 
 .hidden {
     display: none !important;
+}
+
+/* ==========================================
+   히어로 섹션 (Hero Section)
+   ========================================== */
+.hero-section {
+    text-align: center;
+    padding: 80px 20px;
+    margin-bottom: 48px;
+}
+
+.hero-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    letter-spacing: -1px;
+    line-height: 1.2;
+}
+
+.hero-description {
+    font-size: 20px;
+    color: var(--text-secondary);
+    max-width: 768px;
+    margin: 0 auto 32px;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-hero-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-hero-primary:hover {
+    background: #6366f1;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-hero-secondary {
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    padding: 14px 32px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-hero-secondary:hover {
+    background: var(--primary-lighter);
+}
+
+/* ==========================================
+   탭 카드 (Tab Card)
+   ========================================== */
+.tab-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    margin-bottom: 48px;
+    border: 1px solid var(--border);
+}
+
+.tab-header {
+    background: var(--bg-secondary);
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.tab-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.tab-btn {
+    padding: 10px 24px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.tab-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-content {
+    padding: 24px;
+}
+
+.schedule-table-view {
+    overflow-x: auto;
+}
+
+.schedule-table-view table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.schedule-table-view th,
+.schedule-table-view td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid var(--border);
+    font-size: 14px;
+}
+
+.schedule-table-view th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.schedule-table-view td {
+    color: var(--text-secondary);
+}
+
+/* ==========================================
+   통계 섹션 (Stats Section)
+   ========================================== */
+.stats-section {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    box-shadow: var(--shadow-lg);
+    margin-top: 48px;
+    border: 1px solid var(--border);
+}
+
+.stats-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 32px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.stat-number.stat-blue {
+    color: #2563EB;
+}
+
+.stat-number.stat-green {
+    color: #059669;
+}
+
+.stat-number.stat-orange {
+    color: #EA580C;
+}
+
+.stat-label {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 500;
 }
 
 /* 기능 카드 그리드 - Remix Icon 기반 */
@@ -449,60 +802,60 @@ nav {
     box-shadow: var(--shadow-xl);
 }
 
-/* 기능 아이콘 컨테이너 - 48x48px */
+/* 기능 아이콘 컨테이너 - 정확히 48x48px, Tailwind 스타일 */
 .feature-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-lg);
+    width: 48px; /* w-12: 3rem */
+    height: 48px; /* h-12: 3rem */
+    border-radius: 8px; /* rounded-lg: 0.5rem */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 16px;
-    transition: var(--transition);
+    margin: 0 auto 16px; /* mb-4: 1rem */
+    transition: all 0.2s ease;
 }
 
 .feature-icon i {
-    font-size: 24px;
+    font-size: 24px; /* text-2xl: 1.5rem */
 }
 
-/* 기능별 색상 테마 */
+/* 기능별 색상 테마 - Tailwind 정확한 색상 코드 */
 .feature-card-blue .feature-icon {
-    background: #dbeafe;
-    color: #2563eb;
+    background: #DBEAFE; /* bg-blue-100 */
+    color: #2563EB; /* text-blue-600 */
 }
 
 .feature-card-blue:hover .feature-icon {
-    background: #2563eb;
+    background: #2563EB; /* bg-blue-600 */
     color: white;
 }
 
 .feature-card-green .feature-icon {
-    background: #d1fae5;
-    color: #059669;
+    background: #D1FAE5; /* bg-green-100 */
+    color: #059669; /* text-green-600 */
 }
 
 .feature-card-green:hover .feature-icon {
-    background: #059669;
+    background: #059669; /* bg-green-600 */
     color: white;
 }
 
 .feature-card-purple .feature-icon {
-    background: #e9d5ff;
-    color: #9333ea;
+    background: #E9D5FF; /* bg-purple-100 */
+    color: #9333EA; /* text-purple-600 */
 }
 
 .feature-card-purple:hover .feature-icon {
-    background: #9333ea;
+    background: #9333EA; /* bg-purple-600 */
     color: white;
 }
 
 .feature-card-orange .feature-icon {
-    background: #fed7aa;
-    color: #ea580c;
+    background: #FED7AA; /* bg-orange-100 */
+    color: #EA580C; /* text-orange-600 */
 }
 
 .feature-card-orange:hover .feature-icon {
-    background: #ea580c;
+    background: #EA580C; /* bg-orange-600 */
     color: white;
 }
 
@@ -1267,7 +1620,7 @@ button.success:hover {
 }
 
 .dashboard-card h3 i {
-    font-size: 20px;
+    font-size: 20px; /* text-xl: 1.25rem - 가이드 준수 */
     color: var(--primary);
 }
 
@@ -1939,32 +2292,54 @@ button.success:hover {
     color: var(--primary);
 }
 
-/* 액션 버튼 (편집, 삭제) */
+/* 액션 버튼 (편집, 삭제) - Tailwind 정확한 스타일 */
 .action-btn {
-    padding: 8px;
+    padding: 8px; /* p-2: 0.5rem */
     background: transparent;
     border: none;
-    color: var(--text-muted);
-    font-size: 18px;
+    color: #9CA3AF; /* text-gray-400 */
+    font-size: 18px; /* text-lg: 1.125rem */
     cursor: pointer;
     border-radius: var(--radius-sm);
-    transition: var(--transition);
+    transition: color 0.2s ease; /* transition-colors */
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 
-.action-btn:hover {
-    background: var(--bg-secondary);
-}
-
+/* 편집 버튼 호버 - 인디고 */
 .action-btn.edit:hover {
-    color: var(--primary);
+    color: #4F46E5; /* hover:text-indigo-600 */
 }
 
+/* 삭제 버튼 호버 - 빨강 */
 .action-btn.delete:hover {
-    color: var(--danger);
-    background: var(--danger-light);
+    color: #DC2626; /* hover:text-red-600 */
+}
+
+/* 추가 버튼 스타일 */
+.add-btn {
+    width: 100%; /* w-full */
+    border: 2px dashed #D1D5DB; /* border-2 border-dashed border-gray-300 */
+    border-radius: 8px; /* rounded-lg */
+    padding: 24px; /* p-6 */
+    color: #6B7280; /* text-gray-500 */
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease; /* transition-colors */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px; /* mb-2 */
+}
+
+.add-btn:hover {
+    border-color: #A5B4FC; /* hover:border-indigo-300 */
+    color: #4F46E5; /* hover:text-indigo-600 */
+}
+
+.add-btn i {
+    font-size: 24px; /* text-2xl: 1.5rem */
 }
 
 .btn-cancel {
@@ -2118,28 +2493,178 @@ button.success:hover {
     margin-bottom: 12px;
 }
 
-/* 푸터 */
+/* ==========================================
+   푸터 (Footer Section)
+   ========================================== */
 .site-footer {
-    padding: var(--spacing-lg);
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 13px;
-    margin-top: var(--spacing-xl);
-    border-top: 1px solid var(--border-light);
+    background: #1f2937; /* 다크 배경 */
+    color: #d1d5db;
+    padding: 48px 0 0;
+    margin-top: 80px;
+}
+
+.footer-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 32px 48px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 48px;
+}
+
+.footer-column h3,
+.footer-column h4 {
+    margin: 0 0 16px 0;
+}
+
+.footer-logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    font-family: 'Pacifico', cursive;
+}
+
+.footer-description {
+    color: #9ca3af;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.footer-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.footer-links,
+.footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li,
+.footer-contact li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: #9ca3af;
+    text-decoration: none;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.footer-links a:hover {
+    color: var(--primary);
+}
+
+.footer-contact li {
+    color: #9ca3af;
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.footer-contact i {
+    font-size: 16px;
+    margin-top: 2px;
+    color: var(--primary);
+}
+
+/* 푸터 하단 */
+.footer-bottom {
+    border-top: 1px solid #374151;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.footer-bottom p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.footer-powered {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.chat-button {
+    background: #6366f1;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+}
+
+.chat-button:hover {
+    background: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.chat-button i {
+    font-size: 16px;
+}
+
+/* 시간표 관리 섹션 */
+.schedule-management {
+    margin-bottom: 48px;
+}
+
+.section-subtitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-subtitle i {
+    font-size: 28px;
+    color: var(--primary);
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .site-header {
         padding: 12px 16px;
+        flex-wrap: wrap;
     }
     
     .site-header h1 {
-        font-size: 20px;
+        font-size: 18px;
     }
     
     .site-header h1 i {
-        font-size: 24px;
+        font-size: 22px;
+    }
+    
+    .header-nav {
+        order: 3;
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        margin-top: 12px;
     }
     
     .header-actions {
@@ -2151,13 +2676,8 @@ button.success:hover {
         padding: 6px;
     }
     
-    .main-nav {
-        padding: 12px 16px;
-        gap: 6px;
-    }
-    
     .nav-btn {
-        padding: 10px 16px;
+        padding: 8px 16px;
         font-size: 13px;
     }
     
@@ -2173,6 +2693,44 @@ button.success:hover {
         padding: var(--spacing-md);
     }
     
+    /* 히어로 섹션 모바일 */
+    .hero-section {
+        padding: 48px 16px;
+    }
+    
+    .hero-title {
+        font-size: 32px;
+    }
+    
+    .hero-description {
+        font-size: 16px;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-hero-primary,
+    .btn-hero-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* 통계 섹션 모바일 */
+    .stats-section {
+        padding: 24px 16px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    
+    .stat-number {
+        font-size: 36px;
+    }
+    
     .section h2 {
         font-size: 24px;
     }
@@ -2185,6 +2743,26 @@ button.success:hover {
         grid-template-columns: 1fr;
         gap: 16px;
     }
+    
+    /* 푸터 모바일 */
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding: 0 24px 32px;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+        padding: 24px;
+    }
+    
+    .footer-powered {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
     
     .grid {
         grid-template-columns: 1fr;
