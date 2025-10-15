@@ -1,103 +1,924 @@
-.assignments-list-vertical {
-    background: #f7faff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    padding: 16px 12px;
-    min-width: 220px;
-    margin-top: 0;
+/* 대시보드 스타일 개선 */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
 }
-.vertical-row {
+
+.dashboard-card {
+    background: var(--bg-card);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    transition: var(--transition);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.dashboard-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dashboard-card h3::before {
+    content: '📊';
+    font-size: 20px;
+}
+
+/* 대시보드 시간표 */
+.dashboard-timetable {
+    background: var(--bg-card);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    margin-top: var(--spacing-xl);
+}
+
+.dashboard-timetable-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.dashboard-timetable-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.schedule-set-selector {
+    padding: 10px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.schedule-set-selector:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.dashboard-timetable-grid {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+}
+
+/* 요일 선택 체크박스 개선 */
+.day-selection {
+    margin: var(--spacing-md) 0;
+}
+
+.day-selection > label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.day-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.day-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--bg-card);
+    font-size: 14px;
+    font-weight: 500;
+    user-select: none;
+}
+
+.day-checkbox:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.day-checkbox input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+}
+
+.day-checkbox:has(input[type="checkbox"]:checked) {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary-light) 0%, #e0e7ff 100%);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* 시간 입력 개선 */
+.time-inputs {
+    display: flex;
+    gap: 16px;
+    margin: var(--spacing-md) 0;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.time-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.time-select select {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.time-select select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* 컬러 선택 개선 */
+.color-label {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 12px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #e0eaff;
-}
-.vertical-title {
-    flex: 1 1 auto;
+    font-weight: 600;
     font-size: 14px;
-    color: #222;
+    color: var(--text-secondary);
+}
+
+.color-label input[type="color"] {
+    width: 50px;
+    height: 40px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.color-label input[type="color"]:hover {
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+/* ========================================
+   개선된 UI/UX 디자인 시스템
+   ======================================== */
+
+/* 기본 설정 및 CSS 변수 */
+:root {
+    /* 메인 컬러 */
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-light: #eef2ff;
+    
+    /* 배경 컬러 */
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-secondary: #f1f5f9;
+    
+    /* 텍스트 컬러 */
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    
+    /* 보더 컬러 */
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    
+    /* 상태 컬러 */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    
+    /* 그림자 */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    
+    /* 간격 */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* 모서리 */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    
+    /* 전환 효과 */
+    --transition: all 0.2s ease;
+}
+
+/* 기본 리셋 및 공통 스타일 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 헤더 개선 */
+.site-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    padding: 16px 24px;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.5px;
+}
+
+/* 네비게이션 개선 */
+nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 14px;
     font-weight: 500;
+    transition: var(--transition);
+    backdrop-filter: blur(10px);
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.nav-btn.active {
+    background: white;
+    color: var(--primary);
+    border-color: white;
+    box-shadow: var(--shadow-md);
+}
+
+/* 컨테이너 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-lg) var(--spacing-md);
+}
+
+/* 섹션 */
+.section {
+    padding: var(--spacing-lg) 0;
+}
+
+.section h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+    letter-spacing: -0.5px;
+}
+
+.hidden {
+    display: none !important;
+}
+/* 카드 디자인 개선 */
+.card {
+    background: var(--bg-card);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* 그리드 레이아웃 개선 */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+/* 폼 스타일 개선 */
+.form {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin-bottom: var(--spacing-lg);
+    background: var(--bg-card);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+
+.form input[type='text'],
+.form input[type='time'],
+.form input[type='date'],
+.form textarea,
+.form select {
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    flex: 1;
+    min-width: 180px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: var(--transition);
+    background: var(--bg-card);
+}
+
+.form input[type='text']:focus,
+.form input[type='time']:focus,
+.form input[type='date']:focus,
+.form textarea:focus,
+.form select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* 버튼 디자인 개선 */
+.form button,
+button {
+    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    font-family: inherit;
+}
+
+.form button:hover,
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.form button:active,
+button:active {
+    transform: translateY(0);
+}
+
+button.danger,
+.danger {
+    background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+}
+
+button.secondary,
+.btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+button.success {
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+}
+
+/* 리스트 스타일 개선 */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.item {
+    background: var(--bg-card);
+    padding: 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.item:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+}
+
+.item small {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+/* 타이머 카드 개선 */
+.timer-card {
+    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    color: white;
+}
+
+.timer-display {
+    font-size: 56px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timer-controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.timer-controls button {
+    padding: 14px 28px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: var(--transition);
+    background: white;
+    color: var(--primary);
+    box-shadow: var(--shadow-md);
+}
+
+.timer-controls button:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+}
+
+/* 과제 리스트 개선 */
+.assignments-list-vertical {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--border-light);
+}
+
+.vertical-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    transition: var(--transition);
+}
+
+.vertical-row:hover {
+    background: var(--primary-light);
+    transform: translateX(4px);
+}
+
+.vertical-title {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .vertical-dday {
     font-size: 13px;
-    color: #2b6ef6;
+    color: var(--primary);
     font-weight: 700;
-    margin-right: 8px;
+    padding: 4px 10px;
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
 }
+
 .vertical-date {
     font-size: 12px;
-    color: #888;
+    color: var(--text-muted);
 }
-.edit-tools .form {
-    margin-bottom: 18px;
-    background: #fff;
-    border-radius: 6px;
-    padding: 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-}
-/* 기본 레이아웃 */
-:root{
-    --bg:#f6f8fb;
-    --card:#ffffff;
-    --accent:#2b6ef6;
-    --muted:#6b7280;
-}
-*{box-sizing:border-box}
-body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans KR', 'Helvetica Neue', Arial; margin:0; background:var(--bg); color:#111}
-.container{max-width:1000px; margin:24px auto; padding:0 16px}
-.site-header{background:var(--card); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e6e9ef}
-.site-header h1{margin:0; font-size:18px}
-nav{display:flex; gap:8px}
-.nav-btn{background:transparent; border:1px solid transparent; padding:8px 10px; border-radius:6px; cursor:pointer}
-.nav-btn.active{background:var(--accent); color:#fff}
-.section{padding:16px 0}
-.hidden{display:none}
-.grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
-.card{background:var(--card); padding:12px; border-radius:8px; box-shadow:0 1px 2px rgba(16,24,40,0.04)}
-.form{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px}
-.form input[type='text'], .form input[type='time'], .form input[type='date'], .form textarea, .form select{padding:8px; border:1px solid #e5e7eb; border-radius:6px; flex:1; min-width:150px}
-.form button{background:var(--accent); color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer}
-.list{display:flex; flex-direction:column; gap:8px}
-.item{background:linear-gradient(180deg,#fff,#fbfdff); padding:10px; border-radius:6px; border:1px solid #eef2ff; display:flex; justify-content:space-between; align-items:center}
-.item small{color:var(--muted)}
-.timer-card{background:var(--card); padding:16px; border-radius:8px}
-.timer-display{font-size:36px; text-align:center; margin-bottom:12px}
-.timer-controls{display:flex; gap:8px; justify-content:center; margin-bottom:8px}
-.timer-controls button{padding:8px 12px; border-radius:6px; border:none; cursor:pointer}
-.site-footer{padding:12px; text-align:center; color:var(--muted)}
-.schedule-table{width:100%; border-collapse:collapse; background:var(--card); border-radius:8px; overflow:hidden;}
-.schedule-table thead th{background:#f3f7ff; padding:8px; border-bottom:1px solid #e6eefc}
-.schedule-table td{min-height:60px; vertical-align:top; padding:6px; border-bottom:1px solid #f1f5fb}
-.timecol{width:72px; background:#fafbff; color:var(--muted); font-size:13px}
-.sched-entry{background:linear-gradient(180deg,#fff,#fbfdff); padding:6px; border-radius:6px; border:1px solid #eef2ff}
-.sched-entry .meta{color:var(--muted); font-size:12px}
-.sched-entry .actions{margin-top:6px}
-.sched-entry .actions button{margin-right:6px; padding:4px 6px; font-size:12px}
-.form select{min-width:180px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
 
-/* schedule grid */
-.schedule-grid{background:var(--card); border-radius:8px; padding:12px; overflow:auto}
-.grid-header{display:grid; grid-template-columns:72px repeat(7,1fr); align-items:center; margin-bottom:6px}
-.grid-header .head{padding:8px; background:#f3f7ff; border-radius:6px; text-align:center}
-.grid-body{display:grid; grid-template-columns:72px repeat(7,1fr);}
-.time-column{display:flex; flex-direction:column}
-.timecell{padding:6px; min-height:36px; color:var(--muted); border-bottom:1px solid #f1f5fb}
-.day-column{display:flex; flex-direction:column; border-left:1px solid #f1f5fb; min-width:120px}
-.day-column .day-slot-wrapper{position:relative}
-.sched-block{position:absolute; left:8px; right:8px; background:linear-gradient(180deg,#fff,#f8fbff); border:1px solid #e6eefc; border-radius:6px; padding:8px; box-shadow:0 1px 2px rgba(16,24,40,0.03); overflow:hidden; z-index:5}
-.sched-block .btitle{font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.sched-block .blocation{font-size:12px; color:var(--muted)}
-.sched-block .block-actions{display:none}
-.color-label{display:flex; align-items:center; gap:8px}
-.block-delete{position:absolute; top:6px; right:6px; background:#ff4d4f; color:#fff; border:none; width:22px; height:22px; border-radius:4px; cursor:pointer; font-weight:700}
-.slot{border-bottom:1px solid #f1f5fb; cursor:pointer}
-.slot:hover{background:#f8fbff}
+/* 모달 개선 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--spacing-md);
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.modal-close {
+    background: var(--bg-secondary);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: var(--danger);
+    color: white;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: var(--spacing-lg);
+}
+
+.modal-footer {
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn-cancel {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.btn-cancel:hover {
+    background: var(--border);
+}
+
+/* 스케줄 카드 개선 */
+.schedule-card {
+    background: var(--bg-card);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border-light);
+    margin-bottom: 12px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.schedule-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: var(--primary);
+}
+
+.schedule-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+}
+
+.schedule-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.schedule-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.schedule-card-day {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    background: var(--primary);
+    padding: 4px 12px;
+    border-radius: var(--radius-sm);
+}
+
+.schedule-card-time {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.schedule-card-location {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.schedule-card-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.schedule-card-actions button {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+/* 시간표 그리드 개선 */
+.schedule-table {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+}
+
+.schedule-row {
+    display: grid;
+    grid-template-columns: 80px repeat(7, 1fr);
+    min-height: 60px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.schedule-row:last-child {
+    border-bottom: none;
+}
+
+.schedule-row.header {
+    background: linear-gradient(135deg, var(--primary-light) 0%, #e0e7ff 100%);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.time-cell {
+    padding: 16px 12px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--border);
+}
+
+.day-cell {
+    padding: 16px 12px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+    border-right: 1px solid var(--border-light);
+}
+
+.day-cell:last-child {
+    border-right: none;
+}
+
+.day-cell.current-day {
+    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    color: white;
+}
+
+.schedule-cell {
+    padding: 8px;
+    border-right: 1px solid var(--border-light);
+    position: relative;
+    min-height: 60px;
+    transition: var(--transition);
+}
+
+.schedule-cell:hover {
+    background: var(--primary-light);
+}
+
+.schedule-cell:last-child {
+    border-right: none;
+}
+
+.schedule-block {
+    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    margin: 4px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.schedule-block::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary);
+}
+
+.schedule-block:hover {
+    box-shadow: var(--shadow-lg);
+    transform: scale(1.02);
+    z-index: 5;
+}
+
+.schedule-block .block-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.schedule-block .block-time {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+}
+
+.schedule-block .block-location {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.schedule-block .block-location::before {
+    content: '📍';
+    font-size: 11px;
+}
+
+.block-delete {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--danger);
+    color: white;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.schedule-block:hover .block-delete {
+    opacity: 1;
+}
+
+.block-delete:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
 .slot.selected{background:rgba(43,110,246,0.12)}
 
 /* calendar styles removed - keep simple list layout */
@@ -931,8 +1752,8 @@ nav{display:flex; gap:8px}
 
 /* 현재 요일 강조 */
 .current-day {
-    background: #dbeafe !important;
-    color: #1d4ed8 !important;
+    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%) !important;
+    color: white !important;
     font-weight: 600 !important;
 }
 
@@ -940,4 +1761,262 @@ nav{display:flex; gap:8px}
     background: rgba(59, 130, 246, 0.1) !important;
     border-left-color: #3b82f6 !important;
     border-left-width: 4px !important;
+}
+
+/* 스케줄 매니저 개선 */
+.schedule-manager {
+    background: var(--bg-card);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    margin-top: var(--spacing-xl);
+}
+
+.schedule-manager h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.schedule-set-item {
+    background: var(--bg-secondary);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+    border: 1px solid var(--border-light);
+}
+
+.schedule-set-item:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    transform: translateX(4px);
+}
+
+.schedule-set-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+}
+
+.schedule-set-info p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.schedule-set-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.schedule-set-actions button {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+/* 빈 상태 메시지 */
+.empty-message,
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-muted);
+    font-size: 15px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    border: 2px dashed var(--border);
+}
+
+.empty-message::before,
+.empty-state::before {
+    content: '📭';
+    display: block;
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+/* 푸터 */
+.site-footer {
+    padding: var(--spacing-lg);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: var(--spacing-xl);
+    border-top: 1px solid var(--border-light);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .site-header {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+    }
+    
+    .site-header h1 {
+        font-size: 20px;
+    }
+    
+    nav {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .nav-btn {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .container {
+        padding: var(--spacing-md);
+    }
+    
+    .section h2 {
+        font-size: 24px;
+    }
+    
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .form input,
+    .form select,
+    .form button {
+        width: 100%;
+        min-width: 0;
+    }
+    
+    .schedule-row {
+        grid-template-columns: 60px repeat(7, minmax(80px, 1fr));
+    }
+    
+    .day-checkboxes {
+        justify-content: center;
+    }
+    
+    .time-inputs {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .timer-display {
+        font-size: 42px;
+    }
+    
+    .modal-content {
+        margin: var(--spacing-md);
+        max-height: calc(100vh - 32px);
+    }
+}
+
+@media (max-width: 480px) {
+    .schedule-row {
+        grid-template-columns: 50px repeat(7, minmax(70px, 1fr));
+        font-size: 12px;
+    }
+    
+    .time-cell,
+    .day-cell {
+        padding: 12px 6px;
+        font-size: 12px;
+    }
+    
+    .schedule-block {
+        padding: 8px;
+        margin: 2px;
+    }
+    
+    .schedule-block .block-title {
+        font-size: 12px;
+    }
+    
+    .schedule-block .block-time,
+    .schedule-block .block-location {
+        font-size: 11px;
+    }
+    
+    .nav-btn {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* 로딩 애니메이션 */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--border);
+    border-radius: 50%;
+    border-top-color: var(--primary);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 유틸리티 클래스 */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* 포커스 스타일 개선 */
+*:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+button:focus-visible {
+    outline-offset: 4px;
+}
+
+/* 부드러운 전환 효과 */
+* {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }

@@ -1150,37 +1150,12 @@ const App = {
     
     setupDayTimeSelection: () => {
         const dayCheckboxes = Utils.qsa('input[name="class-days"]');
-        let lastSelectedDays = []; // 이전에 선택된 요일들
-        
-        // 시간 입력 필드들
-        const timeInputs = {
-            startHour: Utils.qs('#start-hour'),
-            startMin: Utils.qs('#start-min'),
-            endHour: Utils.qs('#end-hour'),
-            endMin: Utils.qs('#end-min')
-        };
-        
-        // 시간을 기본값으로 리셋하는 함수 (07:00 ~ 08:00)
-        const resetTimeInputs = () => {
-            timeInputs.startHour.value = '07';
-            timeInputs.startMin.value = '00';
-            timeInputs.endHour.value = '08';
-            timeInputs.endMin.value = '00';
-        };
+        let lastSelectedDays = []; // 이전에 선택된 요일들 (추적용으로만 사용)
         
         // 체크박스 변경 이벤트
         dayCheckboxes.forEach(checkbox => {
             EventManager.on(checkbox, 'change', () => {
                 const currentSelectedDays = dayCheckboxes.filter(cb => cb.checked).map(cb => cb.value);
-                
-                // 새로운 요일이 추가되었는지 확인
-                const newlySelected = currentSelectedDays.filter(day => !lastSelectedDays.includes(day));
-                
-                if (newlySelected.length > 0) {
-                    // 새로운 요일이 선택되면 시간 초기화
-                    resetTimeInputs();
-                }
-                
                 lastSelectedDays = [...currentSelectedDays];
             });
         });
@@ -1304,14 +1279,8 @@ const App = {
                 savedSchedules.push(schedule);
             }
             
-            // 체크박스만 해제 (수업명, 장소는 유지)
+            // 체크박스만 해제 (수업명, 장소, 시간은 유지)
             document.querySelectorAll('input[name="class-days"]').forEach(cb => cb.checked = false);
-            
-            // 시간을 기본값으로 리셋
-            Utils.qs('#start-hour').value = '07';
-            Utils.qs('#start-min').value = '00';
-            Utils.qs('#end-hour').value = '08';
-            Utils.qs('#end-min').value = '00';
             
             App.refreshAll();
             
