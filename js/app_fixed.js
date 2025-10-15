@@ -1072,6 +1072,25 @@ const App = {
         const navBtns = Utils.qsa('.nav-btn');
         const sections = Utils.qsa('.section');
         
+        // 로고 클릭 시 대시보드로 이동
+        const logoHome = Utils.qs('#logo-home');
+        if (logoHome) {
+            EventManager.on(logoHome, 'click', () => {
+                try {
+                    navBtns.forEach(b => b.classList.remove('active'));
+                    
+                    sections.forEach(s => {
+                        s.classList.toggle('hidden', s.id !== 'dashboard');
+                    });
+                    
+                    State.ui.activeSection = 'dashboard';
+                    App.handleSectionChange('dashboard');
+                } catch (error) {
+                    console.error('로고 클릭 오류:', error);
+                }
+            });
+        }
+        
         navBtns.forEach(btn => {
             EventManager.on(btn, 'click', () => {
                 try {
@@ -1095,6 +1114,10 @@ const App = {
     
     handleSectionChange: (section) => {
         switch (section) {
+            case 'dashboard':
+                // 대시보드 데이터 새로고침
+                Components.Dashboard.refresh();
+                break;
             case 'assignments':
                 Components.Assignment.renderCalendar();
                 break;

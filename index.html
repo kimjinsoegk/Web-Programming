@@ -6,6 +6,8 @@
     <meta name="description" content="학교생활을 효율적으로 관리하는 스마트 도우미">
     <title>School Life Helper - 학교생활 관리 도우미</title>
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Remix Icon -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,37 +15,96 @@
 </head>
 <body>
     <header class="site-header">
-        <h1>📚 School Life Helper</h1>
-        <nav role="navigation" aria-label="메인 네비게이션">
-            <button data-section="dashboard" class="nav-btn active" aria-label="대시보드 페이지">📊 대시보드</button>
-            <button data-section="schedule" class="nav-btn" aria-label="시간표 페이지">📅 시간표</button>
-            <button data-section="assignments" class="nav-btn" aria-label="과제 페이지">📝 과제</button>
-            <button data-section="notes" class="nav-btn" aria-label="필기노트 페이지">📖 노트</button>
-            <button data-section="timer" class="nav-btn" aria-label="타이머 페이지">⏱️ 타이머</button>
-        </nav>
+        <h1 id="logo-home" style="cursor: pointer;" title="대시보드로 이동">
+            <i class="ri-book-line"></i> School Life Helper
+        </h1>
+        <div class="header-actions">
+            <button class="icon-btn" aria-label="알림" title="알림">
+                <i class="ri-notification-line"></i>
+            </button>
+            <button class="icon-btn" aria-label="사용자 프로필" title="프로필">
+                <i class="ri-user-line"></i>
+            </button>
+        </div>
     </header>
+
+    <nav class="main-nav" role="navigation" aria-label="메인 네비게이션">
+        <button data-section="schedule" class="nav-btn" aria-label="시간표 페이지">
+            <i class="ri-calendar-line"></i>
+            <span>시간표</span>
+        </button>
+        <button data-section="assignments" class="nav-btn" aria-label="과제 페이지">
+            <i class="ri-task-line"></i>
+            <span>과제</span>
+        </button>
+        <button data-section="notes" class="nav-btn" aria-label="필기노트 페이지">
+            <i class="ri-book-2-line"></i>
+            <span>노트</span>
+        </button>
+        <button data-section="timer" class="nav-btn" aria-label="타이머 페이지">
+            <i class="ri-timer-line"></i>
+            <span>타이머</span>
+        </button>
+    </nav>
 
     <main class="container">
         <section id="dashboard" class="section">
-            <h2>📊 대시보드</h2>
+            <h2 class="section-title">
+                <i class="ri-dashboard-line"></i> 대시보드
+            </h2>
+            
+            <!-- 기능 카드 그리드 -->
+            <div class="feature-cards">
+                <div class="feature-card feature-card-blue">
+                    <div class="feature-icon">
+                        <i class="ri-calendar-line"></i>
+                    </div>
+                    <h3>시간표 관리</h3>
+                    <p>수업 일정을 효율적으로 관리하세요</p>
+                </div>
+                
+                <div class="feature-card feature-card-green">
+                    <div class="feature-icon">
+                        <i class="ri-task-line"></i>
+                    </div>
+                    <h3>과제 추적</h3>
+                    <p>마감일을 놓치지 않고 관리하세요</p>
+                </div>
+                
+                <div class="feature-card feature-card-purple">
+                    <div class="feature-icon">
+                        <i class="ri-book-2-line"></i>
+                    </div>
+                    <h3>필기 노트</h3>
+                    <p>수업 내용을 체계적으로 정리하세요</p>
+                </div>
+                
+                <div class="feature-card feature-card-orange">
+                    <div class="feature-icon">
+                        <i class="ri-group-line"></i>
+                    </div>
+                    <h3>클럽 활동</h3>
+                    <p>동아리 일정을 한눈에 확인하세요</p>
+                </div>
+            </div>
             
             <div class="dashboard-grid">
                 <div class="dashboard-card">
-                    <h3>📅 오늘의 시간표</h3>
+                    <h3><i class="ri-calendar-check-line"></i> 오늘의 시간표</h3>
                     <div id="dashboard-schedule" role="region" aria-label="오늘의 시간표">
                         <div class="loading"></div>
                     </div>
                 </div>
                 
                 <div class="dashboard-card">
-                    <h3>📝 다가오는 과제</h3>
+                    <h3><i class="ri-file-list-line"></i> 다가오는 과제</h3>
                     <div id="dashboard-assignments" role="region" aria-label="다가오는 과제 목록">
                         <div class="loading"></div>
                     </div>
                 </div>
                 
                 <div class="dashboard-card">
-                    <h3>⏱️ 오늘 공부 시간</h3>
+                    <h3><i class="ri-time-line"></i> 오늘 공부 시간</h3>
                     <div id="dashboard-study" role="timer" aria-label="오늘 공부한 시간">00:00:00</div>
                 </div>
             </div>
