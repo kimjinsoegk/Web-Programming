@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run assignment page tests",
+			"type": "shell",
+			"command": "npm test",
+			"args": [
+				"--testPathPattern=assignments"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$eslint-stylish"
+			],
+			"group": "test"
+		}
+	]
+}
