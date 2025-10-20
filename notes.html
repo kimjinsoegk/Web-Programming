@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>노트 관리</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script defer src="js/notes.js"></script>
+</head>
+<body>
+    <header class="site-header">
+        <h1 id="logo-home" style="cursor: pointer;" title="홈으로 이동">
+            <i class="ri-book-line"></i> School Life Helper
+        </h1>
+        <nav class="header-nav">
+            <button onclick="location.href='index.html'" class="nav-btn">
+                <i class="ri-home-line"></i>
+                <span>홈</span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="notes-section">
+            <h2>노트 관리</h2>
+            <form id="note-form">
+                <label for="class-select">수업 선택:</label>
+                <select id="class-select" name="class-select" required>
+                    <!-- 수업 목록이 동적으로 추가됩니다 -->
+                </select>
+
+                <label for="note-content">노트 내용:</label>
+                <textarea id="note-content" name="note-content" rows="10" required></textarea>
+
+                <button type="submit">저장</button>
+            </form>
+
+            <div id="notes-display">
+                <h3>저장된 노트</h3>
+                <div id="notes-list"></div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -558,7 +558,6 @@ nav {
 
 .section h2 i {
     font-size: 32px; /* 섹션 타이틀은 더 큰 아이콘 */
-    color: var(--primary);
 }
 
 .hidden {
@@ -1427,7 +1426,7 @@ button.success:hover {
 
 .schedule-block .block-location {
     font-size: 12px;
-    color: var(--text-light);
+    color: #9ca3af;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -2493,436 +2492,102 @@ button.success:hover {
     margin-bottom: 12px;
 }
 
-/* ==========================================
-   푸터 (Footer Section)
-   ========================================== */
-.site-footer {
-    background: #1f2937; /* 다크 배경 */
-    color: #d1d5db;
-    padding: 48px 0 0;
-    margin-top: 80px;
-}
+/* Tailwind CSS 기반의 반응형 디자인 추가 */
 
-.footer-container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 32px 48px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 48px;
-}
-
-.footer-column h3,
-.footer-column h4 {
-    margin: 0 0 16px 0;
-}
-
-.footer-logo {
-    font-size: 20px;
-    font-weight: 700;
-    color: white;
-    font-family: 'Pacifico', cursive;
-}
-
-.footer-description {
-    color: #9ca3af;
-    line-height: 1.6;
-    font-size: 14px;
-}
-
-.footer-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: white;
-    margin-bottom: 16px;
-}
-
-.footer-links,
-.footer-contact {
-    list-style: none;
-    padding: 0;
+/* 공통 레이아웃 */
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    color: #333;
+    background-color: #f9fafb;
     margin: 0;
+    padding: 0;
 }
 
-.footer-links li,
-.footer-contact li {
-    margin-bottom: 12px;
-}
-
-.footer-links a {
-    color: #9ca3af;
-    text-decoration: none;
-    font-size: 14px;
-    transition: var(--transition);
-}
-
-.footer-links a:hover {
-    color: var(--primary);
-}
-
-.footer-contact li {
-    color: #9ca3af;
-    font-size: 14px;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-}
-
-.footer-contact i {
-    font-size: 16px;
-    margin-top: 2px;
-    color: var(--primary);
-}
-
-/* 푸터 하단 */
-.footer-bottom {
-    border-top: 1px solid #374151;
-    padding: 24px 32px;
+header.site-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1280px;
-    margin: 0 auto;
+    padding: 1rem 2rem;
+    background-color: #4f46e5;
+    color: white;
 }
 
-.footer-bottom p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 14px;
-}
-
-.footer-powered {
+header.site-header h1 {
+    font-size: 1.5rem;
     display: flex;
     align-items: center;
-    gap: 16px;
-    color: #6b7280;
-    font-size: 14px;
+    gap: 0.5rem;
 }
 
-.chat-button {
-    background: #6366f1;
-    color: white;
+header.site-header .header-nav {
+    display: flex;
+    gap: 1rem;
+}
+
+header.site-header .nav-btn {
+    background: none;
     border: none;
-    padding: 10px 20px;
-    border-radius: var(--radius-full);
-    font-size: 14px;
-    font-weight: 600;
+    color: white;
+    font-size: 1rem;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: var(--transition);
+    gap: 0.5rem;
+    transition: color 0.2s;
 }
 
-.chat-button:hover {
-    background: #4f46e5;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+header.site-header .nav-btn:hover {
+    color: #d1d5db;
 }
 
-.chat-button i {
-    font-size: 16px;
+/* 반응형 그리드 */
+main {
+    padding: 2rem;
 }
 
-/* 시간표 관리 섹션 */
-.schedule-management {
-    margin-bottom: 48px;
+.timetable-section, .assignments-section, .notes-section {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.section-subtitle {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.timetable-section h2, .assignments-section h2, .notes-section h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    color: #4f46e5;
 }
 
-.section-subtitle i {
-    font-size: 28px;
-    color: var(--primary);
+/* 버튼 스타일 */
+button {
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #4338ca;
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-    .site-header {
-        padding: 12px 16px;
-        flex-wrap: wrap;
-    }
-    
-    .site-header h1 {
-        font-size: 18px;
-    }
-    
-    .site-header h1 i {
-        font-size: 22px;
-    }
-    
-    .header-nav {
-        order: 3;
-        width: 100%;
-        justify-content: flex-start;
-        overflow-x: auto;
-        margin-top: 12px;
-    }
-    
-    .header-actions {
-        gap: 8px;
-    }
-    
-    .icon-btn {
-        font-size: 18px;
-        padding: 6px;
-    }
-    
-    .nav-btn {
-        padding: 8px 16px;
-        font-size: 13px;
-    }
-    
-    .nav-btn i {
-        font-size: 16px;
-    }
-    
-    .nav-btn span {
-        display: none;
-    }
-    
-    .container {
-        padding: var(--spacing-md);
-    }
-    
-    /* 히어로 섹션 모바일 */
-    .hero-section {
-        padding: 48px 16px;
-    }
-    
-    .hero-title {
-        font-size: 32px;
-    }
-    
-    .hero-description {
-        font-size: 16px;
-    }
-    
-    .hero-buttons {
+    header.site-header {
         flex-direction: column;
+        gap: 1rem;
+    }
+
+    .timetable-section, .assignments-section, .notes-section {
+        padding: 1rem;
+    }
+
+    button {
         width: 100%;
     }
-    
-    .btn-hero-primary,
-    .btn-hero-secondary {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    /* 통계 섹션 모바일 */
-    .stats-section {
-        padding: 24px 16px;
-    }
-    
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-    
-    .stat-number {
-        font-size: 36px;
-    }
-    
-    .section h2 {
-        font-size: 24px;
-    }
-    
-    .section h2 i {
-        font-size: 28px;
-    }
-    
-    .feature-cards {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-    
-    /* 푸터 모바일 */
-    .footer-container {
-        grid-template-columns: 1fr;
-        gap: 32px;
-        padding: 0 24px 32px;
-    }
-    
-    .footer-bottom {
-        flex-direction: column;
-        gap: 16px;
-        text-align: center;
-        padding: 24px;
-    }
-    
-    .footer-powered {
-        flex-direction: column;
-        gap: 12px;
-    }
-}
-    
-    .grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .form {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .form input,
-    .form select,
-    .form button {
-        width: 100%;
-        min-width: 0;
-    }
-    
-    .schedule-row {
-        grid-template-columns: 60px repeat(7, minmax(80px, 1fr));
-    }
-    
-    .day-checkboxes {
-        justify-content: center;
-    }
-    
-    .time-inputs {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .timer-display {
-        font-size: 42px;
-    }
-    
-    .modal-content {
-        margin: var(--spacing-md);
-        max-height: calc(100vh - 32px);
-    }
-}
-
-@media (max-width: 480px) {
-    .schedule-row {
-        grid-template-columns: 50px repeat(7, minmax(70px, 1fr));
-        font-size: 12px;
-    }
-    
-    .time-cell,
-    .day-cell {
-        padding: 12px 6px;
-        font-size: 12px;
-    }
-    
-    .schedule-block {
-        padding: 8px;
-        margin: 2px;
-    }
-    
-    .schedule-block .block-title {
-        font-size: 12px;
-    }
-    
-    .schedule-block .block-time,
-    .schedule-block .block-location {
-        font-size: 11px;
-    }
-    
-    .nav-btn {
-        font-size: 12px;
-        padding: 8px 10px;
-    }
-}
-
-/* 스크롤바 스타일 */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-sm);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary-light);
-    border-radius: var(--radius-sm);
-    transition: var(--transition);
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary);
-}
-
-/* 로딩 애니메이션 */
-.loading {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid var(--border);
-    border-radius: 50%;
-    border-top-color: var(--primary);
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* 유틸리티 클래스 */
-.text-center {
-    text-align: center;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.mt-1 { margin-top: var(--spacing-xs); }
-.mt-2 { margin-top: var(--spacing-sm); }
-.mt-3 { margin-top: var(--spacing-md); }
-.mt-4 { margin-top: var(--spacing-lg); }
-
-.mb-1 { margin-bottom: var(--spacing-xs); }
-.mb-2 { margin-bottom: var(--spacing-sm); }
-.mb-3 { margin-bottom: var(--spacing-md); }
-.mb-4 { margin-bottom: var(--spacing-lg); }
-
-/* 포커스 스타일 개선 */
-*:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
-}
-
-button:focus-visible {
-    outline-offset: 4px;
-}
-
-/* 접근성 향상 */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-}
-
-/* 부드러운 전환 효과 */
-* {
-    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-    transition-duration: 200ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }

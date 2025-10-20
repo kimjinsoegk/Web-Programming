@@ -48,35 +48,28 @@ const Utils = {
     generateId: () => Date.now().toString() + Math.random().toString(36).substr(2, 9)
 };
 
-// ===== 로컬 스토리지 추상화 모듈 =====
-const Storage = {
+// ===== 공통 유틸리티 함수 =====
+const LocalStorageUtil = {
     read: (key) => {
         try {
-            const data = localStorage.getItem(key);
-            return data ? JSON.parse(data) : [];
+            return JSON.parse(localStorage.getItem(key)) || [];
         } catch (error) {
-            console.error('Storage read error:', error);
+            console.error(`Error reading from localStorage with key: ${key}`, error);
             return [];
         }
     },
-    
     write: (key, data) => {
         try {
             localStorage.setItem(key, JSON.stringify(data));
-            return true;
         } catch (error) {
-            console.error('Storage write error:', error);
-            return false;
+            console.error(`Error writing to localStorage with key: ${key}`, error);
         }
     },
-    
     clear: (key) => {
         try {
             localStorage.removeItem(key);
-            return true;
         } catch (error) {
-            console.error('Storage clear error:', error);
-            return false;
+            console.error(`Error clearing localStorage with key: ${key}`, error);
         }
     }
 };
@@ -221,7 +214,7 @@ class Note {
 // ===== 서비스 레이어 =====
 const ScheduleService = {
     getAll: () => {
-        return Storage.read(CONFIG.STORAGE_KEYS.SCHEDULE)
+        return LocalStorageUtil.read(CONFIG.STORAGE_KEYS.SCHEDULE)
             .map(data => new Schedule(data));
     },
     
@@ -256,7 +249,7 @@ const ScheduleService = {
             schedules.push(schedule);
         }
         
-        const success = Storage.write(CONFIG.STORAGE_KEYS.SCHEDULE, schedules.map(s => s.toJSON()));
+        const success = LocalStorageUtil.write(CONFIG.STORAGE_KEYS.SCHEDULE, schedules.map(s => s.toJSON()));
         if (!success) {
             throw new Error('저장에 실패했습니다.');
         }
@@ -274,7 +267,7 @@ const ScheduleService = {
     
     delete: (id) => {
         const schedules = ScheduleService.getAll().filter(s => s.id !== id);
-        const success = Storage.write(CONFIG.STORAGE_KEYS.SCHEDULE, schedules.map(s => s.toJSON()));
+        const success = LocalStorageUtil.write(CONFIG.STORAGE_KEYS.SCHEDULE, schedules.map(s => s.toJSON()));
         
         // 시간표 렌더링 및 통계 업데이트
         if (success) {
@@ -290,7 +283,7 @@ const ScheduleService = {
     },
     
     clear: () => {
-        return Storage.clear(CONFIG.STORAGE_KEYS.SCHEDULE);
+        return LocalStorageUtil.clear(CONFIG.STORAGE_KEYS.SCHEDULE);
     },
     
     // 시간 충돌 검사 함수 (배열 반환)
@@ -335,7 +328,7 @@ const ScheduleService = {
 
 const ScheduleSetService = {
     getAll: () => {
-        return Storage.read(CONFIG.STORAGE_KEYS.SAVED_SCHEDULES) || [];
+        return LocalStorageUtil.read(CONFIG.STORAGE_KEYS.SAVED_SCHEDULES) || [];
     },
     
     save: (name, schedules) => {
@@ -354,7 +347,7 @@ const ScheduleSetService = {
             savedSets.push(newSet);
         }
         
-        Storage.write(CONFIG.STORAGE_KEYS.SAVED_SCHEDULES, savedSets);
+        LocalStorageUtil.write(CONFIG.STORAGE_KEYS.SAVED_SCHEDULES, savedSets);
         return newSet;
     },
     
@@ -364,7 +357,7 @@ const ScheduleSetService = {
         
         if (scheduleSet) {
             const schedules = scheduleSet.schedules.map(data => new Schedule(data));
-            Storage.write(CONFIG.STORAGE_KEYS.SCHEDULE, schedules.map(s => s.toJSON()));
+            LocalStorageUtil.write(CONFIG.STORAGE_KEYS.SCHEDULE, schedules.map(s => s.toJSON()));
             return schedules;
         }
         return [];
@@ -372,13 +365,13 @@ const ScheduleSetService = {
     
     delete: (id) => {
         const savedSets = ScheduleSetService.getAll().filter(set => set.id !== id);
-        return Storage.write(CONFIG.STORAGE_KEYS.SAVED_SCHEDULES, savedSets);
+        return LocalStorageUtil.write(CONFIG.STORAGE_KEYS.SAVED_SCHEDULES, savedSets);
     }
 };
 
 const AssignmentService = {
     getAll: () => {
-        return Storage.read(CONFIG.STORAGE_KEYS.ASSIGNMENTS)
+        return LocalStorageUtil.read(CONFIG.STORAGE_KEYS.ASSIGNMENTS)
             .map(data => new Assignment(data));
     },
     
@@ -409,7 +402,7 @@ const AssignmentService = {
             assignments.push(assignment);
         }
         
-        const success = Storage.write(CONFIG.STORAGE_KEYS.ASSIGNMENTS, assignments.map(a => a.toJSON()));
+        const success = LocalStorageUtil.write(CONFIG.STORAGE_KEYS.ASSIGNMENTS, assignments.map(a => a.toJSON()));
         if (!success) {
             throw new Error('저장에 실패했습니다.');
         }
@@ -424,7 +417,7 @@ const AssignmentService = {
     
     delete: (id) => {
         const assignments = AssignmentService.getAll().filter(a => a.id !== id);
-        const success = Storage.write(CONFIG.STORAGE_KEYS.ASSIGNMENTS, assignments.map(a => a.toJSON()));
+        const success = LocalStorageUtil.write(CONFIG.STORAGE_KEYS.ASSIGNMENTS, assignments.map(a => a.toJSON()));
         
         // 통계 업데이트
         if (success && typeof updateDashboardStats === 'function') {
@@ -437,7 +430,7 @@ const AssignmentService = {
 
 const NoteService = {
     getAll: () => {
-        return Storage.read(CONFIG.STORAGE_KEYS.NOTES)
+        return LocalStorageUtil.read(CONFIG.STORAGE_KEYS.NOTES)
             .map(data => new Note(data));
     },
     
@@ -463,7 +456,7 @@ const NoteService = {
             notes.push(note);
         }
         
-        const success = Storage.write(CONFIG.STORAGE_KEYS.NOTES, notes.map(n => n.toJSON()));
+        const success = LocalStorageUtil.write(CONFIG.STORAGE_KEYS.NOTES, notes.map(n => n.toJSON()));
         if (!success) {
             throw new Error('저장에 실패했습니다.');
         }
@@ -473,7 +466,7 @@ const NoteService = {
     
     delete: (id) => {
         const notes = NoteService.getAll().filter(n => n.id !== id);
-        return Storage.write(CONFIG.STORAGE_KEYS.NOTES, notes.map(n => n.toJSON()));
+        return LocalStorageUtil.write(CONFIG.STORAGE_KEYS.NOTES, notes.map(n => n.toJSON()));
     }
 };
 
@@ -1083,6 +1076,14 @@ const Components = {
     }
 };
 
+// ===== 공통 에러 처리 유틸리티 =====
+const ErrorHandler = {
+    logError: (message, error) => {
+        console.error(`[Error] ${message}`, error);
+        alert(`문제가 발생했습니다: ${message}`);
+    }
+};
+
 // ===== 메인 애플리케이션 객체 =====
 const App = {
     init: () => {
@@ -1416,6 +1417,10 @@ const App = {
             Components.Assignment.renderCalendar();
             Components.Note.renderList();
             Components.Schedule.populateSelects();
+            // 홈 시간표 최신화
+            if (typeof renderMainTimetable === 'function') {
+                renderMainTimetable();
+            }
         } catch (error) {
             console.error('UI 렌더링 오류:', error);
         }
@@ -1763,64 +1768,45 @@ function updateDashboardStats() {
 function renderMainTimetable() {
     const container = document.querySelector('#main-timetable-grid');
     if (!container) return;
-    
     const schedules = Storage.read(CONFIG.STORAGE_KEYS.SCHEDULE);
-    
     if (schedules.length === 0) {
         container.innerHTML = '<div class="empty-state"><p>아직 등록된 시간표가 없습니다.</p><p>시간표 메뉴에서 수업을 추가해주세요.</p></div>';
         return;
     }
-    
     const days = ['월', '화', '수', '목', '금'];
     const timeSlots = [];
-    
-    // 시간 슬롯 생성 (7시~18시)
     for (let hour = 7; hour <= 18; hour++) {
         timeSlots.push(`${String(hour).padStart(2, '0')}:00`);
     }
-    
-    // 헤더 생성
     let html = '<div class="schedule-row schedule-header">';
     html += '<div class="time-cell header">시간</div>';
     days.forEach(day => {
         html += `<div class="day-cell header">${day}</div>`;
     });
     html += '</div>';
-    
-    // 시간별 행 생성
     timeSlots.forEach(time => {
         html += '<div class="schedule-row">';
         html += `<div class="time-cell">${time}</div>`;
-        
         days.forEach(day => {
-            const schedule = schedules.find(s => {
-                if (!s.days || !s.days.includes(day)) return false;
-                if (!s.startTime) return false;
-                
-                const [scheduleHour] = s.startTime.split(':').map(Number);
-                const [slotHour] = time.split(':').map(Number);
-                
-                // 시작 시간이 현재 슬롯과 일치하는지 확인
-                return scheduleHour === slotHour;
-            });
-            
-            if (schedule) {
-                const duration = calculateDuration(schedule.startTime, schedule.endTime);
-                html += `<div class="day-cell">
-                    <div class="schedule-block" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            // 해당 요일/시간에 해당하는 모든 수업을 표시
+            const matches = schedules.filter(s => s.day === day && s.start === time);
+            if (matches.length > 0) {
+                html += `<div class="day-cell">`;
+                matches.forEach((schedule, index) => {
+                    const color = `hsl(${(index * 40) % 360}, 70%, 80%)`;
+                    html += `<div class="schedule-block" style="background: ${color}; margin-bottom:4px;">
                         <div class="block-title">${Utils.escapeHtml(schedule.name)}</div>
-                        <div class="block-time">${schedule.startTime} - ${schedule.endTime}</div>
+                        <div class="block-time">${schedule.start} - ${schedule.end}</div>
                         ${schedule.location ? `<div class="block-location"><i class="ri-map-pin-line"></i> ${Utils.escapeHtml(schedule.location)}</div>` : ''}
-                    </div>
-                </div>`;
+                    </div>`;
+                });
+                html += `</div>`;
             } else {
                 html += '<div class="day-cell"></div>';
             }
         });
-        
         html += '</div>';
     });
-    
     container.innerHTML = html;
 }
 
