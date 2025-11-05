@@ -145,6 +145,12 @@
     font-size: 20px;
 }
 
+/* Assignment completed styling */
+.assignment-completed .assignment-info {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
 /* 대시보드 시간표 */
 .dashboard-timetable {
     background: var(--bg-card);
@@ -1744,8 +1750,7 @@ button.success:hover {
 .empty-message {
     text-align: center;
     padding: 40px 20px;
-    color: #6b7280;
-    font-size: 14px;
+    color: #111;
     background: #f9fafb;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
@@ -2525,4 +2530,169 @@ button {
 
 .dashboard-grid {
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+/* Footer bottom inner layout and actions (ensures a black block and proper alignment) */
+.footer-bottom {
+    background: #000; /* dark bar for footer bottom */
+}
+
+.footer-bottom-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.footer-copy {
+    margin: 0;
+    color: #bfbfbf;
+    font-size: 14px;
+}
+
+.footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.footer-powered {
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.chat-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.chat-button .ri-chat-3-line {
+    font-size: 16px;
+}
+
+.chat-button:hover {
+    opacity: 0.95;
+}
+
+@media (max-width: 640px) {
+    .footer-bottom-inner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .footer-actions { margin-top: 8px; }
+}
+
+/* Timetable list styles */
+.timetable-list {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.timetable-day-header {
+    font-weight: 700;
+    margin-top: 12px;
+    margin-bottom: 8px;
+    color: #111827;
+}
+
+.schedule-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border: 1px solid #e6e6e6;
+}
+
+.schedule-item-left { color: #374151; }
+.schedule-time { font-weight: 600; color: #1f2937; }
+.schedule-item-right { text-align: right; color: #374151; }
+.schedule-name { font-weight: 700; }
+.schedule-location { font-size: 13px; color: #6b7280; margin-top: 4px; }
+
+@media (max-width: 640px) {
+    .schedule-item { flex-direction: column; align-items: flex-start; text-align: left; }
+    .schedule-item-right { text-align: left; margin-top: 6px; }
+}
+
+/* Make the entire footer a dark block and style its columns */
+.site-footer {
+    background: #000;
+    color: #fff;
+    padding: 40px 0 0 0;
+}
+
+.site-footer .footer-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.site-footer .footer-column {
+    color: #d1d5db;
+}
+
+.site-footer .footer-logo,
+.site-footer .footer-title {
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.site-footer .footer-description {
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
+.site-footer .footer-links li a {
+    color: #cbd5e1;
+    text-decoration: none;
+    display: block;
+    padding: 4px 0;
+}
+
+.site-footer .footer-contact li {
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+}
+
+.site-footer .footer-contact i {
+    color: #fff;
+    font-size: 18px;
+}
+
+@media (max-width: 900px) {
+    .site-footer .footer-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .site-footer .footer-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .site-footer .footer-contact li { justify-content: center; }
 }

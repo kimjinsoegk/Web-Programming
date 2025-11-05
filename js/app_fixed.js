@@ -164,6 +164,8 @@ class Assignment {
         this.classId = data.classId || '';
         this.start = data.start || '';
         this.end = data.end || '';
+        // completed indicates whether the assignment is finished
+        this.completed = typeof data.completed === 'boolean' ? data.completed : false;
         this.color = data.color || CONFIG.DEFAULT_COLORS.ASSIGNMENT;
         this.notes = data.notes || '';
         this.created = data.created || new Date().toISOString();
@@ -180,6 +182,7 @@ class Assignment {
             classId: this.classId,
             start: this.start,
             end: this.end,
+            completed: this.completed,
             color: this.color,
             notes: this.notes,
             created: this.created
@@ -714,8 +717,8 @@ const Components = {
     },
     
     Schedule: {
-        renderGrid: () => {
-            const grid = Utils.qs('#schedule-grid');
+        renderGrid: (containerSelector) => {
+            const grid = containerSelector ? document.querySelector(containerSelector) : Utils.qs('#schedule-grid');
             if (!grid) return;
             
             const schedules = ScheduleService.getAll();
@@ -874,6 +877,85 @@ const Components = {
                     </div>
                 </div>
             `).join('');
+        },
+        
+        // Render a simple vertical list used by the timetable page and dashboard
+        renderSimpleList: (containerSelector) => {
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+
+            const schedules = ScheduleService.getAll().map(s => s.toJSON());
+            container.innerHTML = '';
+
+            if (!schedules || schedules.length === 0) {
+                container.innerHTML = '<p>저장된 시간표가 없습니다.</p>';
+                return;
+            }
+
+            const dayOrder = ['월','화','수','목','금','토','일'];
+            const grouped = {};
+            schedules.forEach(s => {
+                const day = s.day || '기타';
+                if (!grouped[day]) grouped[day] = [];
+                grouped[day].push(s);
+            });
+
+            const list = document.createElement('div');
+            list.className = 'timetable-list';
+
+            dayOrder.forEach(day => {
+                const items = grouped[day];
+                if (!items || items.length === 0) return;
+
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'timetable-day-header';
+                dayHeader.textContent = day + '요일';
+                list.appendChild(dayHeader);
+
+                // sort by start time
+                items.sort((a,b) => (a.start || a.startTime || '').localeCompare(b.start || b.startTime || ''));
+
+                items.forEach(schedule => list.appendChild(Components.Schedule.createScheduleItem(schedule)));
+            });
+
+            // if there are schedules for days not in order, append them
+            Object.keys(grouped).forEach(day => {
+                if (dayOrder.includes(day)) return;
+                const items = grouped[day];
+                if (!items || items.length === 0) return;
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'timetable-day-header';
+                dayHeader.textContent = day;
+                list.appendChild(dayHeader);
+                items.forEach(schedule => list.appendChild(Components.Schedule.createScheduleItem(schedule)));
+            });
+
+            container.appendChild(list);
+        },
+
+        // helper to create schedule item element
+        createScheduleItem: (schedule) => {
+            const item = document.createElement('div');
+            item.className = 'schedule-item';
+            const start = schedule.start || schedule.startTime || '';
+            const end = schedule.end || schedule.endTime || '';
+
+            item.innerHTML = `
+                <div class="schedule-item-left">
+                    <div class="schedule-time">${Utils.escapeHtml(start)} - ${Utils.escapeHtml(end)}</div>
+                </div>
+                <div class="schedule-item-right">
+                    <div class="schedule-name">${Utils.escapeHtml(schedule.name)}</div>
+                    ${schedule.location ? `<div class="schedule-location">📍 ${Utils.escapeHtml(schedule.location)}</div>` : ''}
+                </div>
+            `;
+
+            if (schedule.color) {
+                item.style.borderLeft = `4px solid ${schedule.color}`;
+                item.style.paddingLeft = '12px';
+            }
+
+            return item;
         },
         
         populateSelects: () => {
@@ -1724,90 +1806,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== 통계 업데이트 함수 =====
 function updateDashboardStats() {
-    // 과제 데이터 가져오기
-    const assignments = Storage.read(CONFIG.STORAGE_KEYS.ASSIGNMENTS);
-    
-    // 완료한 과제 수
+    // 과제 및 시간 통계 (AssignmentService / ScheduleService 사용)
+    try {
+    const assignments = AssignmentService.getAll();
     const completedCount = assignments.filter(a => a.completed).length;
+    const remainingCount = assignments.length - completedCount;
+
     const completedEl = document.querySelector('#stat-completed-assignments');
-    if (completedEl) {
-        completedEl.textContent = completedCount;
-    }
-    
-    // 남은 과제 수 (미완료)
-    const remainingCount = assignments.filter(a => !a.completed).length;
+    if (completedEl) completedEl.textContent = String(completedCount);
+
     const remainingEl = document.querySelector('#stat-remaining-assignments');
-    if (remainingEl) {
-        remainingEl.textContent = remainingCount;
-    }
-    
-    // 학습 시간 계산 (시간표 기반으로 이번 주 수업 시간 합계)
-    const schedules = Storage.read(CONFIG.STORAGE_KEYS.SCHEDULE);
-    let totalMinutes = 0;
-    
-    schedules.forEach(schedule => {
-        if (schedule.startTime && schedule.endTime) {
-            const [startHour, startMin] = schedule.startTime.split(':').map(Number);
-            const [endHour, endMin] = schedule.endTime.split(':').map(Number);
-            const minutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);
-            
-            // 요일 수만큼 곱하기 (예: 월수금이면 3일)
-            const daysCount = schedule.days ? schedule.days.length : 1;
-            totalMinutes += minutes * daysCount;
-        }
-    });
-    
-    const totalHours = Math.round(totalMinutes / 60);
-    const studyTimeEl = document.querySelector('#stat-study-time');
-    if (studyTimeEl) {
-        studyTimeEl.textContent = totalHours + 'h';
+    if (remainingEl) remainingEl.textContent = String(remainingCount);
+
+        // 학습 시간 계산: 각 수업의 한 회 분량을 합산 (주간 합계로 단순화)
+        const schedules = ScheduleService.getAll();
+        let totalMinutes = 0;
+        schedules.forEach(s => {
+            if (s.start && s.end) {
+                const [sh, sm] = s.start.split(':').map(Number);
+                const [eh, em] = s.end.split(':').map(Number);
+                const minutes = (eh * 60 + em) - (sh * 60 + sm);
+                if (!Number.isNaN(minutes) && minutes > 0) totalMinutes += minutes;
+            }
+        });
+        const totalHours = Math.round(totalMinutes / 60);
+        const studyTimeEl = document.querySelector('#stat-study-time');
+        if (studyTimeEl) studyTimeEl.textContent = totalHours + 'h';
+    } catch (err) {
+        console.warn('updateDashboardStats error:', err);
     }
 }
 
 // ===== 메인 시간표 렌더링 함수 =====
 function renderMainTimetable() {
-    const container = document.querySelector('#main-timetable-grid');
-    if (!container) return;
-    const schedules = Storage.read(CONFIG.STORAGE_KEYS.SCHEDULE);
-    if (schedules.length === 0) {
-        container.innerHTML = '<div class="empty-state"><p>아직 등록된 시간표가 없습니다.</p><p>시간표 메뉴에서 수업을 추가해주세요.</p></div>';
-        return;
-    }
-    const days = ['월', '화', '수', '목', '금'];
-    const timeSlots = [];
-    for (let hour = 7; hour <= 18; hour++) {
-        timeSlots.push(`${String(hour).padStart(2, '0')}:00`);
-    }
-    let html = '<div class="schedule-row schedule-header">';
-    html += '<div class="time-cell header">시간</div>';
-    days.forEach(day => {
-        html += `<div class="day-cell header">${day}</div>`;
-    });
-    html += '</div>';
-    timeSlots.forEach(time => {
-        html += '<div class="schedule-row">';
-        html += `<div class="time-cell">${time}</div>`;
-        days.forEach(day => {
-            // 해당 요일/시간에 해당하는 모든 수업을 표시
-            const matches = schedules.filter(s => s.day === day && s.start === time);
-            if (matches.length > 0) {
-                html += `<div class="day-cell">`;
-                matches.forEach((schedule, index) => {
-                    const color = `hsl(${(index * 40) % 360}, 70%, 80%)`;
-                    html += `<div class="schedule-block" style="background: ${color}; margin-bottom:4px;">
-                        <div class="block-title">${Utils.escapeHtml(schedule.name)}</div>
-                        <div class="block-time">${schedule.start} - ${schedule.end}</div>
-                        ${schedule.location ? `<div class="block-location"><i class="ri-map-pin-line"></i> ${Utils.escapeHtml(schedule.location)}</div>` : ''}
-                    </div>`;
-                });
-                html += `</div>`;
-            } else {
-                html += '<div class="day-cell"></div>';
-            }
-        });
-        html += '</div>';
-    });
-    container.innerHTML = html;
+    // Reuse the timetable page renderer so the home shows the exact same format
+    Components.Schedule.renderSimpleList('#main-timetable-grid');
 }
 
 // 수업 시간 계산
@@ -1827,8 +1860,8 @@ function calculateDuration(startTime, endTime) {
 function renderDashboardScheduleTable() {
     const container = document.querySelector('#dashboard-schedule-table');
     if (!container) return;
-    
-    const schedules = Storage.read(CONFIG.STORAGE_KEYS.SCHEDULE);
+
+    const schedules = ScheduleService.getAll().map(s => s.toJSON());
     
     const days = ['월요일', '화요일', '수요일', '목요일', '금요일'];
     const times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'];
@@ -1843,10 +1876,9 @@ function renderDashboardScheduleTable() {
         html += `<tr><td>${time}</td>`;
         days.forEach(day => {
             const shortDay = day.replace('요일', '');
-            const schedule = schedules.find(s => 
-                s.days && s.days.includes(shortDay) && s.startTime === time
-            );
-            html += `<td>${schedule ? schedule.name : '-'}</td>`;
+            // schedules saved by ScheduleService use `day` and `start`
+            const schedule = schedules.find(s => s.day === shortDay && (s.start === time || s.startTime === time));
+            html += `<td>${schedule ? Utils.escapeHtml(schedule.name) : '-'}</td>`;
         });
         html += '</tr>';
     });

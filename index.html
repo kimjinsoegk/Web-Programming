@@ -6,6 +6,7 @@
     <meta name="description" content="학교생활을 효율적으로 관리하는 스마트 도우미">
     <title>School Life Helper - 학교생활 관리 도우미</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script defer src="js/app_fixed.js"></script>
     <!-- Remix Icon -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
     <!-- Google Fonts -->
@@ -525,13 +526,16 @@
         
         <!-- 푸터 하단 -->
         <div class="footer-bottom">
-            <p>© 2024 School Life Helper. All rights reserved.</p>
-            <div class="footer-powered">
-                Powered by React
-                <button class="chat-button">
-                    <i class="ri-chat-3-line"></i>
-                    Talk with Us
-                </button>
+            <div class="footer-bottom-inner">
+                <p class="footer-copy">© 2024 School Life Helper. All rights reserved.</p>
+
+                <div class="footer-actions">
+                    <span class="footer-powered">Powered by React</span>
+                    <button class="chat-button" aria-label="Talk with us">
+                        <i class="ri-chat-3-line"></i>
+                        <span class="chat-text">Talk with Us</span>
+                    </button>
+                </div>
             </div>
         </div>
     </footer>
