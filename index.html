@@ -104,28 +104,28 @@
                 <div class="dashboard-timetable-header">
                     <h3>
                         <i class="ri-calendar-line"></i>
-                        이번 주 시간표
+                        오늘의 수업 요약
                     </h3>
                 </div>
-                <!-- 홈에서 시간표를 보여주는 영역 -->
-                <div id="main-timetable-grid" class="dashboard-timetable-grid" role="table" aria-label="이번 주 시간표">
+                <!-- 홈에서 시간표 요약을 보여주는 영역 -->
+                <div id="main-timetable-grid" class="dashboard-timetable-grid" role="region" aria-label="오늘의 수업 요약">
                     <div class="loading"></div>
                 </div>
             </div>
             
-            <!-- ==========================================
-                 기능 카드 그리드 (Feature Cards Grid)
-                 ========================================== 
-                 그리드: 모바일 1열, 데스크톱 4열
-                 간격: 24px (gap-6)
+          <!-- ==========================================
+              기능 카드 그리드 (Feature Cards Grid)
+              ========================================== 
+              그리드: 모바일 1열, 데스크톱 4열
+              간격: 24px (gap-6)
                  
-                 각 카드 아이콘 컨테이너:
-                 - 크기: 48px × 48px (w-12 h-12)
-                 - 아이콘 크기: 24px (text-2xl)
-                 - 배경: 100단계 색상
-                 - 아이콘: 600단계 색상
-                 - 호버: 배경이 600단계로 변경, 아이콘 흰색
-                 ========================================== -->
+              각 카드 아이콘 컨테이너:
+              - 크기: 48px × 48px (w-12 h-12)
+              - 아이콘 크기: 24px (text-2xl)
+              - 배경: 100단계 색상
+              - 아이콘: 600단계 색상
+              - 호버: 배경이 600단계로 변경, 아이콘 흰색
+              ========================================== -->
             <div class="feature-cards">
                 <!-- 시간표 관리 카드 (파랑 테마) -->
                 <div class="feature-card feature-card-blue">
@@ -189,6 +189,12 @@
                 </div>
             </div>
             
+            <!-- 최근 노트 요약 -->
+            <div class="dashboard-card" style="margin-top:20px;">
+                <h3><i class="ri-book-2-line"></i> 최근 노트</h3>
+                <div id="dashboard-recent-notes"></div>
+            </div>
+
             <!-- 기존 대시보드 카드 (숨김 처리 또는 제거 가능) -->
             <div class="dashboard-grid" style="display: none;">
                 <div class="dashboard-card">
@@ -208,22 +214,6 @@
                 <div class="dashboard-card">
                     <h3><i class="ri-time-line"></i> 오늘 공부 시간</h3>
                     <div id="dashboard-study" role="timer" aria-label="오늘 공부한 시간">00:00:00</div>
-                </div>
-            </div>
-            
-        </section>
-            
-            <div class="assignments-grid" style="display:flex; gap:32px; align-items:flex-start; margin-top: 20px;">
-                <div style="flex:2; min-width:340px;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <h3>과제 캘린더</h3>
-                        <button id="edit-assignments-btn" class="edit-btn" style="margin-bottom:8px;">수정</button>
-                    </div>
-                    <div id="assignments-calendar" class="assignments-calendar">로딩 중...</div>
-                    <div id="edit-tools" class="edit-tools" style="display:none;"></div>
-                </div>
-                <div id="assignments-list-vertical" class="assignments-list-vertical" style="flex:1; min-width:220px;">
-                    <!-- 과제 리스트와 D-day UI가 여기에 렌더링됨 -->
                 </div>
             </div>
         </section>
@@ -443,26 +433,7 @@
             <div id="notes-list" class="list">로딩 중...</div>
         </section>
 
-        <section id="timer" class="section hidden">
-            <h2>스터디 타이머</h2>
-            <div class="timer-card">
-                <div class="timer-display">
-                    <span id="timer-clock">00:00:00</span>
-                </div>
-                <div class="timer-controls">
-                    <button id="start-timer">시작</button>
-                    <button id="pause-timer">일시정지</button>
-                    <button id="reset-timer">리셋</button>
-                </div>
-                <div class="study-stats">
-                    <p>총 누적 공부 시간: <span id="total-study">00:00:00</span></p>
-                    <label>포모도로 모드: <input type="checkbox" id="pomodoro-toggle"></label>
-                    <div id="pomodoro-controls" class="hidden">
-                        <input type="number" id="pomodoro-min" min="1" max="60" value="25">분
-                    </div>
-                </div>
-            </div>
-        </section>
+        
 
     </main>
 

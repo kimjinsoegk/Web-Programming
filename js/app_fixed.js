@@ -520,6 +520,7 @@ const Components = {
         render: () => {
             const schedules = ScheduleService.getAll();
             const assignments = AssignmentService.getSortedByDueDate();
+            const notes = NoteService.getAll();
             
             const dashSchedule = Utils.qs('#dashboard-schedule');
             if (dashSchedule) {
@@ -552,6 +553,31 @@ const Components = {
             
             // 대시보드 시간표 렌더링
             Components.Dashboard.renderTimetable();
+
+            // 최근 노트 요약 렌더링 (상위 3개)
+            const recentContainer = Utils.qs('#dashboard-recent-notes');
+            if (recentContainer) {
+                recentContainer.innerHTML = '';
+                if (!notes || notes.length === 0) {
+                    recentContainer.innerHTML = '<div class="empty-message">최근 노트가 없습니다.</div>';
+                } else {
+                    const sorted = [...notes].sort((a,b) => new Date(b.created) - new Date(a.created)).slice(0,3);
+                    sorted.forEach(n => {
+                        const el = document.createElement('div');
+                        el.className = 'item';
+                        el.innerHTML = `
+                            <div>
+                                <strong>${Utils.escapeHtml(n.title)}</strong>
+                                <div><small>${Utils.escapeHtml(n.classId || '')} · ${new Date(n.created).toLocaleDateString('ko-KR')}</small></div>
+                            </div>
+                            <div>
+                                <button onclick="App.viewNote('${n.id}')">보기</button>
+                            </div>
+                        `;
+                        recentContainer.appendChild(el);
+                    });
+                }
+            }
         },
         
         renderTimetable: () => {
@@ -1082,15 +1108,109 @@ const Components = {
         renderCalendar: () => {
             const cal = Utils.qs('#assignments-calendar');
             if (!cal) return;
-            
-            const assignments = AssignmentService.getAll();
-            
-            if (assignments.length === 0) {
-                cal.innerHTML = '<div class="empty-message">등록된 과제가 없습니다.</div>';
-            } else {
-                cal.innerHTML = '<div style="border: 1px solid #ddd; padding: 20px; background: #f0f8ff; text-align: center;">과제 달력 (간단 버전)</div>';
+
+            // 유지되는 달력 상태 (연, 월)
+            if (!State.ui.calendarDate) {
+                const d = new Date();
+                d.setDate(1);
+                State.ui.calendarDate = d; // first day of current month
             }
-            
+
+            const viewDate = new Date(State.ui.calendarDate.getTime());
+            const year = viewDate.getFullYear();
+            const month = viewDate.getMonth(); // 0-11
+
+            const startOfMonth = new Date(year, month, 1);
+            const endOfMonth = new Date(year, month + 1, 0);
+            const startWeekday = startOfMonth.getDay(); // 0=Sun
+            const daysInMonth = endOfMonth.getDate();
+
+            const assignments = AssignmentService.getAll();
+
+            // Helpers
+            const fmt = (date) => Utils.formatDate(date);
+            const inRange = (dateISO, startISO, endISO) => {
+                return dateISO >= startISO && dateISO <= endISO;
+            };
+
+            // Header with navigation
+            let html = '';
+            html += '<div class="calendar-nav">';
+            html += '<button class="cal-arrow" id="cal-prev" aria-label="이전 달">◀</button>';
+            html += `<div class="cal-label">${year}년 ${month + 1}월</div>`;
+            html += '<button class="cal-arrow" id="cal-next" aria-label="다음 달">▶</button>';
+            html += '</div>';
+
+            // Weekday header
+            const weekdays = ['일','월','화','수','목','금','토'];
+            html += '<div class="assign-calendar-header">';
+            weekdays.forEach(w => { html += `<div class="cell head">${w}</div>`; });
+            html += '</div>';
+
+            // Cells grid
+            html += '<div class="assign-calendar-grid">';
+            html += '<div class="assign-calendar-cells">';
+
+            // Leading blanks
+            for (let i = 0; i < startWeekday; i++) {
+                html += '<div class="cell empty"></div>';
+            }
+
+            // Days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const iso = fmt(date);
+
+                // Find assignments intersecting this day
+                const items = assignments.filter(a => inRange(iso, a.start, a.end));
+
+                html += '<div class="cell">';
+                html += `<div class="day-num">${day}</div>`;
+
+                // Render up to 2 compact bars at bottom
+                items.slice(0, 2).forEach(a => {
+                    const color = a.color || CONFIG.DEFAULT_COLORS.ASSIGNMENT;
+                    const title = Utils.escapeHtml(a.title);
+                    html += `<div class="assign-bar" style="background:${color}" title="${title} (마감: ${Utils.escapeHtml(a.end)})" onclick="App.viewAssignment('${a.id}')">` +
+                            `<span class="bar-title">${title}</span>` +
+                            `</div>`;
+                });
+
+                // If more remain, show +N indicator
+                const more = items.length - 2;
+                if (more > 0) {
+                    html += `<div style="position:absolute; right:6px; bottom:6px; font-size:11px; color:#666;">+${more}</div>`;
+                }
+
+                html += '</div>';
+            }
+
+            html += '</div>'; // cells
+            html += '</div>'; // grid
+
+            cal.innerHTML = html;
+
+            // Hook up navigation
+            const prevBtn = Utils.qs('#cal-prev');
+            const nextBtn = Utils.qs('#cal-next');
+            if (prevBtn) {
+                EventManager.on(prevBtn, 'click', () => {
+                    const d = new Date(State.ui.calendarDate.getTime());
+                    d.setMonth(d.getMonth() - 1);
+                    State.ui.calendarDate = d;
+                    Components.Assignment.renderCalendar();
+                });
+            }
+            if (nextBtn) {
+                EventManager.on(nextBtn, 'click', () => {
+                    const d = new Date(State.ui.calendarDate.getTime());
+                    d.setMonth(d.getMonth() + 1);
+                    State.ui.calendarDate = d;
+                    Components.Assignment.renderCalendar();
+                });
+            }
+
+            // Also refresh the vertical D-day list next to the calendar
             Components.Assignment.renderVerticalList();
         },
         
@@ -1839,8 +1959,60 @@ function updateDashboardStats() {
 
 // ===== 메인 시간표 렌더링 함수 =====
 function renderMainTimetable() {
-    // Reuse the timetable page renderer so the home shows the exact same format
-    Components.Schedule.renderSimpleList('#main-timetable-grid');
+    const container = document.querySelector('#main-timetable-grid');
+    if (!container) return;
+
+    // 홈은 요약을 보여준다: 오늘의 수업 리스트 (간단 요약)
+    const schedules = ScheduleService.getAll();
+    if (!schedules || schedules.length === 0) {
+        container.innerHTML = '<div class="empty-message">등록된 시간표가 없습니다.</div>';
+        return;
+    }
+
+    const todayIdx = new Date().getDay(); // 0-일
+    const dayMap = ['일','월','화','수','목','금','토'];
+    const today = dayMap[todayIdx];
+
+    const todays = schedules
+        .filter(s => s.day === today)
+        .sort((a, b) => a.start.localeCompare(b.start));
+
+    if (todays.length === 0) {
+        container.innerHTML = '<div class="empty-message">오늘 예정된 수업이 없습니다.</div>';
+        return;
+    }
+
+    const list = document.createElement('div');
+    list.className = 'timetable-list';
+    const header = document.createElement('div');
+    header.className = 'timetable-day-header';
+    header.textContent = `오늘 (${today})`;
+    list.appendChild(header);
+
+    todays.forEach(schedule => {
+        const item = Components?.Schedule?.createScheduleItem
+            ? Components.Schedule.createScheduleItem(schedule)
+            : (() => {
+                const el = document.createElement('div');
+                el.className = 'schedule-item';
+                el.style.borderLeft = `4px solid ${schedule.color || CONFIG.DEFAULT_COLORS.SCHEDULE}`;
+                el.style.paddingLeft = '12px';
+                el.innerHTML = `
+                    <div class="schedule-item-left">
+                        <div class="schedule-time">${Utils.escapeHtml(schedule.start)} - ${Utils.escapeHtml(schedule.end)}</div>
+                    </div>
+                    <div class="schedule-item-right">
+                        <div class="schedule-name">${Utils.escapeHtml(schedule.name)}</div>
+                        ${schedule.location ? `<div class="schedule-location">📍 ${Utils.escapeHtml(schedule.location)}</div>` : ''}
+                    </div>
+                `;
+                return el;
+            })();
+        list.appendChild(item);
+    });
+
+    container.innerHTML = '';
+    container.appendChild(list);
 }
 
 // 수업 시간 계산

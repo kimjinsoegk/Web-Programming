@@ -6,11 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ? CONFIG.STORAGE_KEYS.SCHEDULE
         : 'sl_schedule_v1';
 
-    // Load saved schedules and render using the shared renderer
+    // Load saved schedules and render using the shared grid renderer
     const loadSchedules = () => {
         try {
-            if (typeof Components !== 'undefined' && Components.Schedule && Components.Schedule.renderSimpleList) {
-                Components.Schedule.renderSimpleList('#timetable-grid');
+            if (typeof Components !== 'undefined' && Components.Schedule && Components.Schedule.renderGrid) {
+                // Use the unified 30-minute slot grid renderer for consistency
+                Components.Schedule.renderGrid('#timetable-grid');
             } else {
                 // fallback: render raw schedules
                 const schedules = LocalStorageUtil.read(STORAGE_KEY);

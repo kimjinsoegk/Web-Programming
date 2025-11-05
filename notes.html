@@ -6,7 +6,6 @@
     <title>노트 관리</title>
     <link rel="stylesheet" href="css/styles.css">
     <script defer src="js/app_fixed.js"></script>
-    <script defer src="js/notes.js"></script>
 </head>
 <body>
     <header class="site-header">
@@ -24,21 +23,18 @@
     <main>
         <section class="notes-section">
             <h2>노트 관리</h2>
-            <form id="note-form">
-                <label for="class-select">수업 선택:</label>
-                <select id="class-select" name="class-select" required>
-                    <!-- 수업 목록이 동적으로 추가됩니다 -->
+            <form id="note-form" class="form">
+                <select id="note-class" required>
+                    <option value="">수업 선택</option>
                 </select>
-
-                <label for="note-content">노트 내용:</label>
-                <textarea id="note-content" name="note-content" rows="10" required></textarea>
-
+                <input type="text" id="note-title" placeholder="노트 제목" required>
+                <textarea id="note-content" placeholder="내용" rows="10" required></textarea>
                 <button type="submit">저장</button>
             </form>
 
-            <div id="notes-display">
+            <div id="notes-display" style="margin-top:16px;">
                 <h3>저장된 노트</h3>
-                <div id="notes-list"></div>
+                <div id="notes-list" class="list"></div>
             </div>
         </section>
     </main>
