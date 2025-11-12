@@ -1926,6 +1926,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { threshold: 0.12 });
 
         toReveal.forEach(el => observer.observe(el));
+
+        // 기능 카드 클릭 시 섹션 이동
+        const featureCards = document.querySelectorAll('.feature-card[data-target]');
+        featureCards.forEach(card => {
+            const go = () => {
+                const target = card.getAttribute('data-target');
+                if (target === 'club') {
+                    alert('클럽 활동 기능은 준비 중입니다.');
+                    return;
+                }
+                // 네비게이션과 동일한 방식으로 섹션 전환
+                const sections = Utils.qsa('.section');
+                sections.forEach(s => s.classList.toggle('hidden', s.id !== target));
+                State.ui.activeSection = target;
+                if (typeof App.handleSectionChange === 'function') {
+                    App.handleSectionChange(target);
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+            card.addEventListener('click', go);
+            card.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    go();
+                }
+            });
+        });
     } catch (e) {
         console.warn('Landing interactions init failed:', e);
     }
@@ -1975,20 +2002,26 @@ function updateDashboardStats() {
     const remainingEl = document.querySelector('#stat-remaining-assignments');
     if (remainingEl) remainingEl.textContent = String(remainingCount);
 
-        // 학습 시간 계산: 각 수업의 한 회 분량을 합산 (주간 합계로 단순화)
-        const schedules = ScheduleService.getAll();
-        let totalMinutes = 0;
-        schedules.forEach(s => {
-            if (s.start && s.end) {
-                const [sh, sm] = s.start.split(':').map(Number);
-                const [eh, em] = s.end.split(':').map(Number);
-                const minutes = (eh * 60 + em) - (sh * 60 + sm);
-                if (!Number.isNaN(minutes) && minutes > 0) totalMinutes += minutes;
+        // 과제 남은 시간: 가장 가까운 마감 과제까지 남은 시간
+        const now = new Date();
+        const upcoming = assignments
+            .filter(a => !a.completed && a.end)
+            .map(a => ({ a, due: new Date(a.end + 'T23:59:59') }))
+            .filter(x => x.due >= now)
+            .sort((x, y) => x.due - y.due)[0];
+
+        const etaEl = document.querySelector('#stat-next-eta');
+        if (etaEl) {
+            if (upcoming) {
+                const diffMs = upcoming.due.getTime() - now.getTime();
+                const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                if (days > 0) etaEl.textContent = `${days}일 ${hours}시간`;
+                else etaEl.textContent = `${hours}시간`;
+            } else {
+                etaEl.textContent = '-';
             }
-        });
-        const totalHours = Math.round(totalMinutes / 60);
-        const studyTimeEl = document.querySelector('#stat-study-time');
-        if (studyTimeEl) studyTimeEl.textContent = totalHours + 'h';
+        }
     } catch (err) {
         console.warn('updateDashboardStats error:', err);
     }
