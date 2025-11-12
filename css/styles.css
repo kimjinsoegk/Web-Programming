@@ -574,9 +574,11 @@ nav {
    히어로 섹션 (Hero Section)
    ========================================== */
 .hero-section {
+    position: relative;
     text-align: center;
-    padding: 80px 20px;
+    padding: 120px 20px 100px;
     margin-bottom: 48px;
+    overflow: hidden;
 }
 
 .hero-title {
@@ -643,6 +645,55 @@ nav {
 .btn-hero-secondary:hover {
     background: var(--primary-lighter);
 }
+
+/* Hero dynamic background and blobs */
+.hero-bg {
+    background: linear-gradient(135deg, #eef2ff 0%, #f7faff 50%, #ffffff 100%);
+}
+
+.hero-visual {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.blob {
+    position: absolute;
+    width: 480px;
+    height: 480px;
+    right: -120px;
+    top: -80px;
+    background: radial-gradient(circle at 30% 30%, rgba(43,110,246,0.35), transparent 60%),
+                radial-gradient(circle at 70% 70%, rgba(147,51,234,0.25), transparent 60%);
+    filter: blur(20px);
+    transform: translateZ(0);
+    animation: float1 14s ease-in-out infinite;
+}
+
+.blob-2 {
+    left: -140px;
+    top: 140px;
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(circle at 50% 50%, rgba(16,185,129,0.25), transparent 60%);
+    animation: float2 16s ease-in-out infinite;
+}
+
+@keyframes float1 {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(-20px, 15px) scale(1.05); }
+}
+@keyframes float2 {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(15px, -20px) scale(1.08); }
+}
+
+/* Scroll reveal */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+.reveal-visible { opacity: 1; transform: translateY(0); }
+
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }
 
 /* ==========================================
    탭 카드 (Tab Card)

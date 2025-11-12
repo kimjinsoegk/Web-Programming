@@ -61,15 +61,19 @@ const LocalStorageUtil = {
     write: (key, data) => {
         try {
             localStorage.setItem(key, JSON.stringify(data));
+            return true;
         } catch (error) {
             console.error(`Error writing to localStorage with key: ${key}`, error);
+            return false;
         }
     },
     clear: (key) => {
         try {
             localStorage.removeItem(key);
+            return true;
         } catch (error) {
             console.error(`Error clearing localStorage with key: ${key}`, error);
+            return false;
         }
     }
 };
@@ -1892,6 +1896,39 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 메인 시간표 렌더링
     renderMainTimetable();
+    
+    // 랜딩 인터랙션: 스크롤 리빌 및 히어로 버튼 동작
+    try {
+        const primaryBtn = document.querySelector('.btn-hero-primary');
+        if (primaryBtn) {
+            primaryBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector('#schedule');
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+
+        const toReveal = [
+            ...document.querySelectorAll('.feature-card'),
+            ...document.querySelectorAll('.stats-section'),
+            ...document.querySelectorAll('.dashboard-timetable'),
+            ...document.querySelectorAll('#dashboard-recent-notes')
+        ];
+        toReveal.forEach(el => el.classList.add('reveal'));
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        toReveal.forEach(el => observer.observe(el));
+    } catch (e) {
+        console.warn('Landing interactions init failed:', e);
+    }
     
     // 탭 전환 기능
     const tabBtns = document.querySelectorAll('.tab-btn');
