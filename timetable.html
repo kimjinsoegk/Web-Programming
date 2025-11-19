@@ -23,13 +23,13 @@
     <main>
         <section class="timetable-section">
             <h2>시간표 관리</h2>
-            
-            <!-- 시간표 세트 관리 -->
-            <div id="schedule-manager" class="schedule-manager">
-                <!-- JS로 렌더링 -->
+
+            <!-- 주간 시간표 -->
+            <div class="table-wrap" style="margin-bottom:20px;">
+                <div id="schedule-grid" class="schedule-grid"></div>
             </div>
 
-            <!-- 수업 추가 폼 -->
+            <!-- 수업 추가 폼 (그리드 아래 위치) -->
             <form id="schedule-form" class="form">
                 <input type="text" id="class-name" placeholder="수업명" required>
 
@@ -103,15 +103,15 @@
                 <button type="button" id="clear-schedules" class="danger">전체 삭제</button>
             </form>
 
-            <!-- 주간 시간표 -->
-            <div class="table-wrap">
-                <div id="schedule-grid" class="schedule-grid"></div>
+            <!-- 시간표 세트 관리 -->
+            <div id="schedule-manager" class="schedule-manager">
+                <!-- JS로 렌더링 -->
             </div>
 
-            <!-- 시간표 카드 리스트 -->
+            <!-- 시간표 요약 리스트 -->
             <div class="schedule-management">
                 <h3>등록된 시간표</h3>
-                <div id="schedule-cards" class="schedule-cards"></div>
+                <div id="schedule-summary"></div>
             </div>
 
             <!-- 수정 모달 -->
