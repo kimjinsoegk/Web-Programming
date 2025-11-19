@@ -2558,43 +2558,16 @@ button.success:hover {
     margin-bottom: 12px;
 }
 
-<<<<<<< HEAD
-/* Tailwind 빌드 파이프라인이 없으므로 @tailwind/@apply 구문 제거 */
-=======
-/* Tailwind CSS를 활용한 UI/UX 일관성 개선 */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* 공통 스타일 */
-body {
-    @apply bg-gray-50 text-gray-800;
-}
-
-header {
-    @apply bg-indigo-600 text-white shadow-md;
-}
-
-nav a {
-    @apply text-gray-400 hover:text-gray-600;
-}
-
-button {
-    @apply px-4 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600;
-}
-
-/* 페이지별 스타일 */
-.dashboard-card {
-    @apply bg-white p-6 rounded-lg shadow-md hover:shadow-lg;
-}
-
-.dashboard-card h3 {
-    @apply text-lg font-semibold;
-}
-
-.dashboard-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
-}
+/* Tailwind directives removed (no build pipeline). Replaced with explicit CSS. */
+body { background:#f8fafc; color:#1f2937; }
+header { background:#ffffff; color:#111827; box-shadow:0 1px 2px rgba(0,0,0,.08); }
+nav a { color:#4b5563; text-decoration:none; }
+nav a:hover { color:#111827; }
+button { font-family:inherit; }
+.dashboard-card { background:#fff; padding:24px; border-radius:16px; box-shadow:0 4px 12px -2px rgba(0,0,0,.08); border:1px solid #e5e7eb; transition:.2s; }
+.dashboard-card:hover { box-shadow:0 10px 28px -6px rgba(0,0,0,.18); transform:translateY(-3px); }
+.dashboard-card h3 { font-size:16px; font-weight:700; margin:0 0 12px; color:#111827; display:flex; align-items:center; gap:8px; }
+.dashboard-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; }
 
 /* Footer bottom inner layout and actions (ensures a black block and proper alignment) */
 .footer-bottom {
@@ -2651,12 +2624,8 @@ button {
 }
 
 @media (max-width: 640px) {
-    .footer-bottom-inner {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-    .footer-actions { margin-top: 8px; }
+    .footer-bottom-inner { flex-direction:column; align-items:center; text-align:center; }
+    .footer-actions { margin-top:8px; }
 }
 
 /* Timetable list styles */
@@ -2760,4 +2729,3 @@ button {
     }
     .site-footer .footer-contact li { justify-content: center; }
 }
->>>>>>> 646612ace892269754c82d67afc9a4477995f93b
