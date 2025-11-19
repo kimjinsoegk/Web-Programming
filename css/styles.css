@@ -2492,37 +2492,4 @@ button.success:hover {
     margin-bottom: 12px;
 }
 
-/* Tailwind CSS를 활용한 UI/UX 일관성 개선 */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* 공통 스타일 */
-body {
-    @apply bg-gray-50 text-gray-800;
-}
-
-header {
-    @apply bg-indigo-600 text-white shadow-md;
-}
-
-nav a {
-    @apply text-gray-400 hover:text-gray-600;
-}
-
-button {
-    @apply px-4 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600;
-}
-
-/* 페이지별 스타일 */
-.dashboard-card {
-    @apply bg-white p-6 rounded-lg shadow-md hover:shadow-lg;
-}
-
-.dashboard-card h3 {
-    @apply text-lg font-semibold;
-}
-
-.dashboard-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
-}
+/* Tailwind 빌드 파이프라인이 없으므로 @tailwind/@apply 구문 제거 */
