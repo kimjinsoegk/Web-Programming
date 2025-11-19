@@ -3,8 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const notesList = document.getElementById('notes-list');
     const classSelect = document.getElementById('class-select');
 
-    const NOTES_STORAGE_KEY = 'sl_notes_v1';
-    const CLASSES_STORAGE_KEY = 'sl_schedule_v1';
+    const NOTES_STORAGE_KEY = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_KEYS && CONFIG.STORAGE_KEYS.NOTES)
+        ? CONFIG.STORAGE_KEYS.NOTES
+        : 'sl_notes_v1';
+
+    const CLASSES_STORAGE_KEY = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_KEYS && CONFIG.STORAGE_KEYS.SCHEDULE)
+        ? CONFIG.STORAGE_KEYS.SCHEDULE
+        : 'sl_schedule_v1';
 
     // Load classes into the dropdown
     const loadClasses = () => {

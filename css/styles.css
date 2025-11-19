@@ -145,6 +145,12 @@
     font-size: 20px;
 }
 
+/* Assignment completed styling */
+.assignment-completed .assignment-info {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
 /* 대시보드 시간표 */
 .dashboard-timetable {
     background: var(--bg-card);
@@ -568,9 +574,21 @@ nav {
    히어로 섹션 (Hero Section)
    ========================================== */
 .hero-section {
+    position: relative;
     text-align: center;
-    padding: 80px 20px;
+    padding: 120px 20px 100px;
     margin-bottom: 48px;
+    overflow: hidden;
+}
+/* 고품질 학습 이미지 배경 (가독성 보정 오버레이) */
+.hero-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('https://images.unsplash.com/photo-1513258496099-48168024aec0?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
+    opacity: 0.18;
+    filter: saturate(1.05) contrast(1.05);
+    pointer-events: none;
 }
 
 .hero-title {
@@ -637,6 +655,55 @@ nav {
 .btn-hero-secondary:hover {
     background: var(--primary-lighter);
 }
+
+/* Hero dynamic background and blobs */
+.hero-bg {
+    background: linear-gradient(135deg, #eef2ff 0%, #f7faff 50%, #ffffff 100%);
+}
+
+.hero-visual {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.blob {
+    position: absolute;
+    width: 480px;
+    height: 480px;
+    right: -120px;
+    top: -80px;
+    background: radial-gradient(circle at 30% 30%, rgba(43,110,246,0.35), transparent 60%),
+                radial-gradient(circle at 70% 70%, rgba(147,51,234,0.25), transparent 60%);
+    filter: blur(20px);
+    transform: translateZ(0);
+    animation: float1 14s ease-in-out infinite;
+}
+
+.blob-2 {
+    left: -140px;
+    top: 140px;
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(circle at 50% 50%, rgba(16,185,129,0.25), transparent 60%);
+    animation: float2 16s ease-in-out infinite;
+}
+
+@keyframes float1 {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(-20px, 15px) scale(1.05); }
+}
+@keyframes float2 {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(15px, -20px) scale(1.08); }
+}
+
+/* Scroll reveal */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+.reveal-visible { opacity: 1; transform: translateY(0); }
+
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }
 
 /* ==========================================
    탭 카드 (Tab Card)
@@ -1744,8 +1811,7 @@ button.success:hover {
 .empty-message {
     text-align: center;
     padding: 40px 20px;
-    color: #6b7280;
-    font-size: 14px;
+    color: #111;
     background: #f9fafb;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
@@ -2492,4 +2558,206 @@ button.success:hover {
     margin-bottom: 12px;
 }
 
+<<<<<<< HEAD
 /* Tailwind 빌드 파이프라인이 없으므로 @tailwind/@apply 구문 제거 */
+=======
+/* Tailwind CSS를 활용한 UI/UX 일관성 개선 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 공통 스타일 */
+body {
+    @apply bg-gray-50 text-gray-800;
+}
+
+header {
+    @apply bg-indigo-600 text-white shadow-md;
+}
+
+nav a {
+    @apply text-gray-400 hover:text-gray-600;
+}
+
+button {
+    @apply px-4 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600;
+}
+
+/* 페이지별 스타일 */
+.dashboard-card {
+    @apply bg-white p-6 rounded-lg shadow-md hover:shadow-lg;
+}
+
+.dashboard-card h3 {
+    @apply text-lg font-semibold;
+}
+
+.dashboard-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+/* Footer bottom inner layout and actions (ensures a black block and proper alignment) */
+.footer-bottom {
+    background: #000; /* dark bar for footer bottom */
+}
+
+.footer-bottom-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.footer-copy {
+    margin: 0;
+    color: #bfbfbf;
+    font-size: 14px;
+}
+
+.footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.footer-powered {
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.chat-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.chat-button .ri-chat-3-line {
+    font-size: 16px;
+}
+
+.chat-button:hover {
+    opacity: 0.95;
+}
+
+@media (max-width: 640px) {
+    .footer-bottom-inner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .footer-actions { margin-top: 8px; }
+}
+
+/* Timetable list styles */
+.timetable-list {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.timetable-day-header {
+    font-weight: 700;
+    margin-top: 12px;
+    margin-bottom: 8px;
+    color: #111827;
+}
+
+.schedule-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border: 1px solid #e6e6e6;
+}
+
+.schedule-item-left { color: #374151; }
+.schedule-time { font-weight: 600; color: #1f2937; }
+.schedule-item-right { text-align: right; color: #374151; }
+.schedule-name { font-weight: 700; }
+.schedule-location { font-size: 13px; color: #6b7280; margin-top: 4px; }
+
+@media (max-width: 640px) {
+    .schedule-item { flex-direction: column; align-items: flex-start; text-align: left; }
+    .schedule-item-right { text-align: left; margin-top: 6px; }
+}
+
+/* Make the entire footer a dark block and style its columns */
+.site-footer {
+    background: #000;
+    color: #fff;
+    padding: 40px 0 0 0;
+}
+
+.site-footer .footer-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.site-footer .footer-column {
+    color: #d1d5db;
+}
+
+.site-footer .footer-logo,
+.site-footer .footer-title {
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.site-footer .footer-description {
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
+.site-footer .footer-links li a {
+    color: #cbd5e1;
+    text-decoration: none;
+    display: block;
+    padding: 4px 0;
+}
+
+.site-footer .footer-contact li {
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+}
+
+.site-footer .footer-contact i {
+    color: #fff;
+    font-size: 18px;
+}
+
+@media (max-width: 900px) {
+    .site-footer .footer-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .site-footer .footer-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .site-footer .footer-contact li { justify-content: center; }
+}
+>>>>>>> 646612ace892269754c82d67afc9a4477995f93b

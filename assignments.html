@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>과제 관리</title>
     <link rel="stylesheet" href="css/styles.css">
-    <script defer src="js/assignments.js"></script>
+    <!-- core app utilities (LocalStorageUtil, ErrorHandler, services) -->
+    <script defer src="js/app_fixed.js"></script>
 </head>
 <body>
     <header class="site-header">
@@ -23,23 +24,29 @@
     <main>
         <section class="assignments-section">
             <h2>과제 관리</h2>
-            <form id="assignment-form">
-                <label for="assignment-title">과제명:</label>
-                <input type="text" id="assignment-title" name="assignment-title" required>
-
-                <label for="start-date">시작일:</label>
-                <input type="date" id="start-date" name="start-date" required>
-
-                <label for="due-date">마감일:</label>
-                <input type="date" id="due-date" name="due-date" required>
-
-                <button type="submit">저장</button>
-            </form>
-
-            <div id="assignments-display">
-                <h3>저장된 과제</h3>
-                <div id="assignments-list"></div>
+            <div class="assignments-grid" style="display:grid; grid-template-columns: 2fr 1fr; gap:24px; align-items:start;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <div class="calendar-nav"></div>
+                        <button id="edit-assignments-btn" class="edit-btn" style="margin-left:12px;">수정</button>
+                    </div>
+                    <div id="assignments-calendar" class="assignments-calendar">로딩 중...</div>
+                    <div id="edit-tools" class="edit-tools" style="display:none;"></div>
+                    <div id="assignments-list-vertical" class="assignments-list-vertical" style="margin-top:12px;"></div>
+                </div>
+                <form id="assignment-form" class="form">
+                    <input type="text" id="assignment-title" placeholder="과제 제목" required>
+                    <select id="assignment-class">
+                        <option value="">수업 선택 (선택사항)</option>
+                    </select>
+                    <label>시작일: <input type="date" id="assignment-start" required></label>
+                    <label>마감일: <input type="date" id="assignment-end" required></label>
+                    <label>색상: <input type="color" id="assignment-color" value="#ff8a65"></label>
+                    <textarea id="assignment-notes" placeholder="세부 내용"></textarea>
+                    <button type="submit">추가</button>
+                </form>
             </div>
+            <div id="assignments-list" class="list" style="margin-top:20px;">로딩 중...</div>
         </section>
     </main>
 </body>

@@ -6,6 +6,7 @@
     <meta name="description" content="학교생활을 효율적으로 관리하는 스마트 도우미">
     <title>School Life Helper - 학교생활 관리 도우미</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script defer src="js/app_fixed.js"></script>
     <!-- Remix Icon -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
     <!-- Google Fonts -->
@@ -45,12 +46,6 @@
             <button data-section="notes" class="nav-btn" aria-label="필기노트 페이지">
                 <i class="ri-book-2-line"></i>
                 <span>노트</span>
-            </button>
-            
-            <!-- 타이머 버튼 -->
-            <button data-section="timer" class="nav-btn" aria-label="타이머 페이지">
-                <i class="ri-timer-line"></i>
-                <span>타이머</span>
             </button>
         </nav>
         
@@ -94,78 +89,53 @@
                         더 알아보기
                     </button>
                 </div>
+                <div class="hero-visual" aria-hidden="true">
+                    <div class="blob"></div>
+                    <div class="blob blob-2"></div>
+                </div>
             </div>
-            
+
+            <!-- 기능 카드: 상단에 바로 노출 -->
+            <div class="feature-cards">
+                <div class="feature-card feature-card-blue" data-target="schedule" role="button" tabindex="0" aria-label="시간표 관리로 이동">
+                    <div class="feature-icon"><i class="ri-calendar-line"></i></div>
+                    <h3>시간표 관리</h3>
+                    <p>매일 시간표를 한눈에 관리할 수 있습니다</p>
+                </div>
+                <div class="feature-card feature-card-green" data-target="assignments" role="button" tabindex="0" aria-label="과제 추적으로 이동">
+                    <div class="feature-icon"><i class="ri-task-line"></i></div>
+                    <h3>과제 추적</h3>
+                    <p>과제 마감일을 놓치지 않고 관리할 수 있습니다</p>
+                </div>
+                <div class="feature-card feature-card-purple" data-target="notes" role="button" tabindex="0" aria-label="필기 노트로 이동">
+                    <div class="feature-icon"><i class="ri-book-2-line"></i></div>
+                    <h3>필기 노트</h3>
+                    <p>수업 내용을 체계적으로 기록할 수 있습니다</p>
+                </div>
+                <div class="feature-card feature-card-orange" data-target="club" role="button" tabindex="0" aria-label="클럽 활동 (준비 중)">
+                    <div class="feature-icon"><i class="ri-group-line"></i></div>
+                    <h3>클럽 활동</h3>
+                    <p>동아리의 활동 및 일정을 관리할 수 있습니다</p>
+                </div>
+            </div>
+
             <!-- ==========================================
-                 이번 주 시간표 (읽기 전용)
+                 이번 주 시간표 (요약)
                  ========================================== -->
             <div class="dashboard-timetable" style="margin-top: 40px;">
                 <div class="dashboard-timetable-header">
                     <h3>
                         <i class="ri-calendar-line"></i>
-                        이번 주 시간표
+                        오늘의 수업 요약
                     </h3>
                 </div>
-                <!-- 홈에서 시간표를 보여주는 영역 -->
-                <div id="main-timetable-grid" class="dashboard-timetable-grid" role="table" aria-label="이번 주 시간표">
+                <!-- 홈에서 시간표 요약을 보여주는 영역 -->
+                <div id="main-timetable-grid" class="dashboard-timetable-grid" role="region" aria-label="오늘의 수업 요약">
                     <div class="loading"></div>
                 </div>
             </div>
             
-            <!-- ==========================================
-                 기능 카드 그리드 (Feature Cards Grid)
-                 ========================================== 
-                 그리드: 모바일 1열, 데스크톱 4열
-                 간격: 24px (gap-6)
-                 
-                 각 카드 아이콘 컨테이너:
-                 - 크기: 48px × 48px (w-12 h-12)
-                 - 아이콘 크기: 24px (text-2xl)
-                 - 배경: 100단계 색상
-                 - 아이콘: 600단계 색상
-                 - 호버: 배경이 600단계로 변경, 아이콘 흰색
-                 ========================================== -->
-            <div class="feature-cards">
-                <!-- 시간표 관리 카드 (파랑 테마) -->
-                <div class="feature-card feature-card-blue">
-                    <!-- 아이콘 컨테이너: bg #DBEAFE, icon #2563EB -->
-                    <div class="feature-icon">
-                        <i class="ri-calendar-line"></i>
-                    </div>
-                    <h3>시간표 관리</h3>
-                    <p>매일 시간표를 한눈에 관리할 수 있습니다</p>
-                </div>
-                
-                <!-- 과제 추적 카드 (초록 테마) -->
-                <div class="feature-card feature-card-green">
-                    <!-- 아이콘 컨테이너: bg #D1FAE5, icon #059669 -->
-                    <div class="feature-icon">
-                        <i class="ri-task-line"></i>
-                    </div>
-                    <h3>과제 추적</h3>
-                    <p>과제 마감일을 놓치지 않고 관리할 수 있습니다</p>
-                </div>
-                
-                <!-- 필기 노트 카드 (보라 테마) -->
-                <div class="feature-card feature-card-purple">
-                    <!-- 아이콘 컨테이너: bg #E9D5FF, icon #9333EA -->
-                    <div class="feature-icon">
-                        <i class="ri-book-2-line"></i>
-                    </div>
-                    <h3>필기 노트</h3>
-                    <p>수업 내용을 체계적으로 기록할 수 있습니다</p>
-                </div>
-                
-                <!-- 클럽 활동 카드 (주황 테마) -->
-                <div class="feature-card feature-card-orange">
-                    <!-- 아이콘 컨테이너: bg #FED7AA, icon #EA580C -->
-                    <div class="feature-icon">
-                        <i class="ri-group-line"></i>
-                    </div>
-                    <h3>클럽 활동</h3>
-                    <p>동아리의 활동 및 일정을 관리할 수 있습니다</p>
-                </div>
-            </div>
+            
             
             <!-- ==========================================
                  통계 섹션 - 이번 주 학습 현황
@@ -182,12 +152,18 @@
                         <div class="stat-label">남은 과제</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number stat-orange" id="stat-study-time">0h</div>
-                        <div class="stat-label">학습 시간</div>
+                        <div class="stat-number stat-orange" id="stat-next-eta">-</div>
+                        <div class="stat-label">과제 남은 시간</div>
                     </div>
                 </div>
             </div>
             
+            <!-- 최근 노트 요약 -->
+            <div class="dashboard-card" style="margin-top:20px;">
+                <h3><i class="ri-book-2-line"></i> 최근 노트</h3>
+                <div id="dashboard-recent-notes"></div>
+            </div>
+
             <!-- 기존 대시보드 카드 (숨김 처리 또는 제거 가능) -->
             <div class="dashboard-grid" style="display: none;">
                 <div class="dashboard-card">
@@ -207,22 +183,6 @@
                 <div class="dashboard-card">
                     <h3><i class="ri-time-line"></i> 오늘 공부 시간</h3>
                     <div id="dashboard-study" role="timer" aria-label="오늘 공부한 시간">00:00:00</div>
-                </div>
-            </div>
-            
-        </section>
-            
-            <div class="assignments-grid" style="display:flex; gap:32px; align-items:flex-start; margin-top: 20px;">
-                <div style="flex:2; min-width:340px;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <h3>과제 캘린더</h3>
-                        <button id="edit-assignments-btn" class="edit-btn" style="margin-bottom:8px;">수정</button>
-                    </div>
-                    <div id="assignments-calendar" class="assignments-calendar">로딩 중...</div>
-                    <div id="edit-tools" class="edit-tools" style="display:none;"></div>
-                </div>
-                <div id="assignments-list-vertical" class="assignments-list-vertical" style="flex:1; min-width:220px;">
-                    <!-- 과제 리스트와 D-day UI가 여기에 렌더링됨 -->
                 </div>
             </div>
         </section>
@@ -442,26 +402,7 @@
             <div id="notes-list" class="list">로딩 중...</div>
         </section>
 
-        <section id="timer" class="section hidden">
-            <h2>스터디 타이머</h2>
-            <div class="timer-card">
-                <div class="timer-display">
-                    <span id="timer-clock">00:00:00</span>
-                </div>
-                <div class="timer-controls">
-                    <button id="start-timer">시작</button>
-                    <button id="pause-timer">일시정지</button>
-                    <button id="reset-timer">리셋</button>
-                </div>
-                <div class="study-stats">
-                    <p>총 누적 공부 시간: <span id="total-study">00:00:00</span></p>
-                    <label>포모도로 모드: <input type="checkbox" id="pomodoro-toggle"></label>
-                    <div id="pomodoro-controls" class="hidden">
-                        <input type="number" id="pomodoro-min" min="1" max="60" value="25">분
-                    </div>
-                </div>
-            </div>
-        </section>
+        
 
     </main>
 
@@ -488,7 +429,7 @@
                     <li><a href="#schedule">시간표 관리</a></li>
                     <li><a href="#assignments">과제 추적</a></li>
                     <li><a href="#notes">필기 노트</a></li>
-                    <li><a href="#timer">클럽 활동</a></li>
+                    <li><a href="#notes">클럽 활동</a></li>
                 </ul>
             </div>
             
@@ -525,13 +466,16 @@
         
         <!-- 푸터 하단 -->
         <div class="footer-bottom">
-            <p>© 2024 School Life Helper. All rights reserved.</p>
-            <div class="footer-powered">
-                Powered by React
-                <button class="chat-button">
-                    <i class="ri-chat-3-line"></i>
-                    Talk with Us
-                </button>
+            <div class="footer-bottom-inner">
+                <p class="footer-copy">© 2024 School Life Helper. All rights reserved.</p>
+
+                <div class="footer-actions">
+                    <span class="footer-powered">Powered by React</span>
+                    <button class="chat-button" aria-label="Talk with us">
+                        <i class="ri-chat-3-line"></i>
+                        <span class="chat-text">Talk with Us</span>
+                    </button>
+                </div>
             </div>
         </div>
     </footer>
