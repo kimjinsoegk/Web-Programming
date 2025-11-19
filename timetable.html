@@ -22,121 +22,96 @@
 
     <main>
         <section class="timetable-section">
-            <div class="timetable-header">
-                <div class="timetable-current">
-                    <h2 class="timetable-title" id="active-timetable-name">최근 시간표</h2>
-                    <div class="timetable-sub" id="active-timetable-meta">불러온 시간표가 없습니다.</div>
-                </div>
-                <div class="timetable-controls">
-                    <button class="mini-btn" id="btn-open-create" aria-expanded="false" aria-controls="timetable-create-panel">
-                        <i class="ri-add-line"></i> 추가
-                    </button>
-                    <div class="select-wrapper">
-                        <button class="mini-btn" id="btn-open-selector" aria-haspopup="true" aria-expanded="false">
-                            <i class="ri-folders-line"></i> 시간표 선택
-                        </button>
-                        <div class="selector-popover" id="timetable-selector" hidden>
-                            <div class="selector-header">
-                                <span>저장된 시간표</span>
-                                <button class="selector-close" aria-label="닫기">&times;</button>
-                            </div>
-                            <div class="selector-list" id="timetable-set-list">로딩 중...</div>
-                        </div>
+            <h2>시간표 관리</h2>
+            
+            <!-- 시간표 세트 관리 -->
+            <div id="schedule-manager" class="schedule-manager">
+                <!-- JS로 렌더링 -->
+            </div>
+
+            <!-- 수업 추가 폼 -->
+            <form id="schedule-form" class="form">
+                <input type="text" id="class-name" placeholder="수업명" required>
+
+                <div class="day-selection">
+                    <label>요일 선택:</label>
+                    <div class="day-checkboxes">
+                        <label class="day-checkbox"><input type="checkbox" name="class-days" value="월"> 월</label>
+                        <label class="day-checkbox"><input type="checkbox" name="class-days" value="화"> 화</label>
+                        <label class="day-checkbox"><input type="checkbox" name="class-days" value="수"> 수</label>
+                        <label class="day-checkbox"><input type="checkbox" name="class-days" value="목"> 목</label>
+                        <label class="day-checkbox"><input type="checkbox" name="class-days" value="금"> 금</label>
+                        <label class="day-checkbox"><input type="checkbox" name="class-days" value="토"> 토</label>
+                        <label class="day-checkbox"><input type="checkbox" name="class-days" value="일"> 일</label>
                     </div>
                 </div>
-            </div>
 
-            <!-- 생성 패널 (초기 숨김) -->
-            <div class="timetable-create-panel" id="timetable-create-panel" hidden>
-                <div class="create-header">
-                    <h3>새 시간표 작성</h3>
-                    <button class="panel-close" id="btn-close-create" aria-label="닫기">&times;</button>
-                </div>
-                <div class="create-body">
-                    <label class="inline-field">
-                        <span>시간표 이름</span>
-                        <input type="text" id="new-set-name" placeholder="예: 1학년 1학기" maxlength="40" />
+                <div class="time-inputs">
+                    <label class="time-select">시작: 
+                        <select id="start-hour">
+                            <option value="07" selected>07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                        </select>
+                        :
+                        <select id="start-min">
+                            <option value="00" selected>00</option>
+                            <option value="30">30</option>
+                        </select>
                     </label>
-                    <form id="schedule-form" class="form compact">
-                        <input type="text" id="class-name" placeholder="수업명" required>
-                        <div class="day-selection">
-                            <label>요일:</label>
-                            <div class="day-checkboxes">
-                                <label class="day-checkbox"><input type="checkbox" name="class-days" value="월"> 월</label>
-                                <label class="day-checkbox"><input type="checkbox" name="class-days" value="화"> 화</label>
-                                <label class="day-checkbox"><input type="checkbox" name="class-days" value="수"> 수</label>
-                                <label class="day-checkbox"><input type="checkbox" name="class-days" value="목"> 목</label>
-                                <label class="day-checkbox"><input type="checkbox" name="class-days" value="금"> 금</label>
-                                <label class="day-checkbox"><input type="checkbox" name="class-days" value="토"> 토</label>
-                                <label class="day-checkbox"><input type="checkbox" name="class-days" value="일"> 일</label>
-                            </div>
-                        </div>
-                        <div class="time-inputs">
-                            <label class="time-select">시작: 
-                                <select id="start-hour">
-                                    <option value="07" selected>07</option>
-                                    <option value="08">08</option>
-                                    <option value="09">09</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
-                                    <option value="13">13</option>
-                                    <option value="14">14</option>
-                                    <option value="15">15</option>
-                                    <option value="16">16</option>
-                                    <option value="17">17</option>
-                                    <option value="18">18</option>
-                                    <option value="19">19</option>
-                                    <option value="20">20</option>
-                                </select>
-                                :
-                                <select id="start-min">
-                                    <option value="00" selected>00</option>
-                                    <option value="30">30</option>
-                                </select>
-                            </label>
-                            <label class="time-select">종료: 
-                                <select id="end-hour">
-                                    <option value="07">07</option>
-                                    <option value="08" selected>08</option>
-                                    <option value="09">09</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
-                                    <option value="13">13</option>
-                                    <option value="14">14</option>
-                                    <option value="15">15</option>
-                                    <option value="16">16</option>
-                                    <option value="17">17</option>
-                                    <option value="18">18</option>
-                                    <option value="19">19</option>
-                                    <option value="20">20</option>
-                                </select>
-                                :
-                                <select id="end-min">
-                                    <option value="00" selected>00</option>
-                                    <option value="30">30</option>
-                                </select>
-                            </label>
-                        </div>
-                        <input type="text" id="location" placeholder="장소 (선택)">
-                        <label class="color-label">블록 색상: <input type="color" id="class-color" value="#2b6ef6"></label>
-                        <div class="create-actions">
-                            <button type="submit" class="btn-add-class">수업 추가</button>
-                            <button type="button" id="clear-schedules" class="danger btn-clear">전체 삭제</button>
-                        </div>
-                    </form>
-                    <div class="pending-class-list" id="pending-class-list">현재 추가된 수업이 없습니다.</div>
-                    <button type="button" class="btn-save-set" id="btn-save-timetable" disabled>시간표 저장</button>
-                </div>
-            </div>
 
-            <!-- 저장된 시간표 리스트 (기본 숨김) -->
-            <div id="schedule-manager" class="schedule-manager" hidden></div>
+                    <label class="time-select">종료: 
+                        <select id="end-hour">
+                            <option value="07">07</option>
+                            <option value="08" selected>08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                        </select>
+                        :
+                        <select id="end-min">
+                            <option value="00" selected>00</option>
+                            <option value="30">30</option>
+                        </select>
+                    </label>
+                </div>
+
+                <input type="text" id="location" placeholder="장소 (선택)">
+                <label class="color-label">블록 색상: <input type="color" id="class-color" value="#2b6ef6"></label>
+                
+                <button type="submit">추가</button>
+                <button type="button" id="clear-schedules" class="danger">전체 삭제</button>
+            </form>
 
             <!-- 주간 시간표 -->
             <div class="table-wrap">
                 <div id="schedule-grid" class="schedule-grid"></div>
+            </div>
+
+            <!-- 시간표 카드 리스트 -->
+            <div class="schedule-management">
+                <h3>등록된 시간표</h3>
+                <div id="schedule-cards" class="schedule-cards"></div>
             </div>
 
             <!-- 수정 모달 -->
