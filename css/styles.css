@@ -208,9 +208,8 @@
 .hero-section .hero-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18), transparent 55%),
-                linear-gradient(135deg, rgba(15,23,42,0.85), rgba(15,23,42,0.6));
-    mix-blend-mode: multiply;
+    /* 사진 선명도 최우선: 오버레이 거의 없음 */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 25%);
     pointer-events: none;
 }
 
@@ -220,55 +219,57 @@
 }
 
 .hero-title {
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: -0.03em;
-    text-shadow: 0 10px 25px rgba(15,23,42,0.6);
+    /* 그림자 완전 제거 - 깔끔한 텍스트 */
 }
 
 .hero-description {
-    font-weight: 500;
-    text-shadow: 0 4px 12px rgba(15,23,42,0.7);
+    font-weight: 600;
+    /* 그림자 완전 제거 - 깔끔한 텍스트 */
 }
 
 .hero-buttons .btn-hero-primary,
 .hero-buttons .btn-hero-secondary {
-    box-shadow: 0 10px 25px rgba(15,23,42,0.45);
+    /* 버튼만 약간의 그림자 유지 */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.15);
 }
 
 .hero-buttons .btn-hero-primary:hover,
 .hero-buttons .btn-hero-secondary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 18px 35px rgba(15,23,42,0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.2);
 }
 
-/* 튜토리얼 오버레이 */
+/* 튜토리얼 오버레이 - 전체 어두운 배경 (낮은 z-index) */
 .tutorial-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15,23,42,0.65);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 40;
+    background: rgba(0,0,0,0.75);
+    z-index: 9998;
+    pointer-events: none;
 }
 
+/* 튜토리얼 하이라이트 - 설명되는 요소를 밝게 */
 .tutorial-highlight {
-    position: fixed;
-    z-index: 41;
+    position: absolute;
+    z-index: 9999;
     pointer-events: none;
-    box-shadow: 0 0 0 9999px rgba(15,23,42,0.65);
+    background: transparent;
+    border: 3px solid rgba(79,70,229,0.9);
     border-radius: 16px;
-    transition: var(--transition);
+    box-shadow: 0 0 0 4px rgba(79,70,229,0.2);
+    transition: all 0.3s ease;
 }
 
 .tutorial-tooltip {
     position: fixed;
-    z-index: 42;
+    z-index: 10000;
     max-width: 320px;
-    padding: 16px 18px;
-    border-radius: 14px;
+    padding: 20px;
+    border-radius: 16px;
     background: #ffffff;
-    box-shadow: var(--shadow-xl);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.2);
     color: var(--text-primary);
 }
 
@@ -294,10 +295,18 @@
 .tutorial-btn-skip {
     padding: 6px 10px;
     border-radius: 999px;
-    border: 1px solid var(--border);
-    background: #fff;
+    border: 1px solid #9ca3af;
+    background: #6b7280;
+    color: #ffffff;
     font-size: 12px;
+    font-weight: 500;
     cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tutorial-btn-skip:hover {
+    background: #4b5563;
+    border-color: #6b7280;
 }
 
 .tutorial-btn-next {

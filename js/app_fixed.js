@@ -648,22 +648,22 @@ const Tutorial = (() => {
         {
             targetSelector: '.feature-card[data-target="schedule"]',
             title: '시간표 관리',
-            body: '수업 시간을 등록하고, 주간 시간표를 한눈에 볼 수 있어요.'
+            body: '수업 시간을 등록하고, 주간 시간표를 한눈에 볼 수 있는 공간이에요.'
         },
         {
             targetSelector: '.feature-card[data-target="assignments"]',
             title: '과제 추적',
-            body: '과제 마감일을 등록하고, 대시보드와 캘린더에서 쉽게 확인해요.'
+            body: '과제 마감일과 진행 상태를 한 번에 관리할 수 있어요.'
         },
         {
             targetSelector: '.feature-card[data-target="notes"]',
             title: '필기 노트',
-            body: '수업별로 노트를 정리해서, 나중에 다시 찾아보기 편해요.'
+            body: '수업별로 필기를 정리하고, 나중에 다시 복습하기 좋아요.'
         },
         {
             targetSelector: '.feature-card[data-target="club"]',
             title: '클럽 활동',
-            body: '동아리 활동과 일정을 한 곳에서 관리할 수 있도록 준비 중이에요.'
+            body: '동아리 일정과 공지를 관리할 수 있는 기능으로, 곧 준비될 예정이에요.'
         }
     ];
 
@@ -681,6 +681,7 @@ const Tutorial = (() => {
     };
 
     const positionForTarget = (target) => {
+        // 위치 계산 및 하이라이트/말풍선 배치
         const rect = target.getBoundingClientRect();
 
         if (!highlightEl) {
@@ -689,8 +690,9 @@ const Tutorial = (() => {
             document.body.appendChild(highlightEl);
         }
 
+        // 하이라이트 박스 위치 (absolute - 문서 기준)
         highlightEl.style.top = `${rect.top - 8 + window.scrollY}px`;
-        highlightEl.style.left = `${rect.left - 8 + window.scrollX}px`;
+        highlightEl.style.left = `${rect.left - 8}px`;
         highlightEl.style.width = `${rect.width + 16}px`;
         highlightEl.style.height = `${rect.height + 16}px`;
 
@@ -700,16 +702,38 @@ const Tutorial = (() => {
             document.body.appendChild(tooltipEl);
         }
 
-        const top = rect.bottom + 16 + window.scrollY;
-        let left = rect.left + window.scrollX;
-        const maxRight = left + 320;
+        // 말풍선 위치 계산 - 현재 뷰포트 기준 (fixed position)
+        // 요소가 화면 하단에 가까우면 위에, 아니면 아래에 표시
+        const viewportHeight = window.innerHeight;
+        const spaceBelow = viewportHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        
+        let tooltipTop;
+        if (spaceBelow > 200) {
+            // 아래쪽 공간이 충분하면 요소 아래에 표시
+            tooltipTop = rect.bottom + 20;
+        } else if (spaceAbove > 200) {
+            // 위쪽 공간이 충분하면 요소 위에 표시
+            tooltipTop = rect.top - 180; // 말풍선 높이 약 160px + 여유 20px
+        } else {
+            // 공간이 부족하면 화면 중앙에 표시
+            tooltipTop = (viewportHeight - 160) / 2;
+        }
+        
+        const tooltipLeft = rect.left + (rect.width / 2) - 160; // 중앙 정렬 (말풍선 너비 320px의 절반)
+        
+        // 화면 밖으로 나가지 않도록 조정
         const viewportWidth = window.innerWidth;
-        if (maxRight > viewportWidth - 16) {
-            left = viewportWidth - 16 - 320;
+        let finalLeft = tooltipLeft;
+        
+        if (tooltipLeft < 16) {
+            finalLeft = 16;
+        } else if (tooltipLeft + 320 > viewportWidth - 16) {
+            finalLeft = viewportWidth - 336;
         }
 
-        tooltipEl.style.top = `${top}px`;
-        tooltipEl.style.left = `${Math.max(16, left)}px`;
+        tooltipEl.style.top = `${tooltipTop}px`;
+        tooltipEl.style.left = `${finalLeft}px`;
     };
 
     const renderStep = () => {
@@ -721,26 +745,53 @@ const Tutorial = (() => {
 
         const target = document.querySelector(step.targetSelector);
         if (!target) {
+            console.error(`튜토리얼 타겟을 찾을 수 없습니다: ${step.targetSelector}`);
             clear();
             return;
         }
 
+        console.log(`📚 튜토리얼 ${currentStep + 1}/${STEPS.length}: ${step.title}`);
+
+        // 오버레이 생성 및 구멍 뚫기 (clip-path 사용)
         let overlay = document.querySelector('.tutorial-overlay');
         if (!overlay) {
             overlay = document.createElement('div');
             overlay.className = 'tutorial-overlay';
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) {
-                    // 바깥 클릭 시 무시하여 오직 버튼으로만 진행/종료
-                    e.stopPropagation();
-                }
-            });
             document.body.appendChild(overlay);
         }
+        
+        // 타겟 요소 위치를 기준으로 clip-path 설정
+        const rect = target.getBoundingClientRect();
+        const topRect = rect.top + window.scrollY - 8;
+        const leftRect = rect.left - 8;
+        const rightRect = rect.left + rect.width + 8;
+        const bottomRect = rect.top + window.scrollY + rect.height + 8;
+        
+        // clip-path로 오버레이에 구멍 뚫기
+        overlay.style.clipPath = `polygon(
+            0% 0%, 0% 100%, 100% 100%, 100% 0%, 0% 0%,
+            ${leftRect}px ${topRect}px,
+            ${rightRect}px ${topRect}px,
+            ${rightRect}px ${bottomRect}px,
+            ${leftRect}px ${bottomRect}px,
+            ${leftRect}px ${topRect}px
+        )`;
 
-        positionForTarget(target);
+        // 툴팁 생성 및 내용 설정
+        if (!tooltipEl) {
+            tooltipEl = document.createElement('div');
+            tooltipEl.className = 'tutorial-tooltip';
+            document.body.appendChild(tooltipEl);
+        }
 
         tooltipEl.innerHTML = '';
+        
+        // 진행 상태 표시
+        const progress = document.createElement('div');
+        progress.className = 'tutorial-progress';
+        progress.textContent = `${currentStep + 1} / ${STEPS.length}`;
+        progress.style.cssText = 'font-size: 12px; color: #9ca3af; margin-bottom: 8px; font-weight: 600;';
+        
         const title = document.createElement('div');
         title.className = 'tutorial-tooltip-title';
         title.textContent = step.title;
@@ -755,18 +806,25 @@ const Tutorial = (() => {
         const btnSkip = document.createElement('button');
         btnSkip.className = 'tutorial-btn-skip';
         btnSkip.textContent = '건너뛰기';
-        btnSkip.addEventListener('click', () => {
+        btnSkip.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('⏭️ 튜토리얼 건너뛰기');
             clear();
         });
 
         const btnNext = document.createElement('button');
         btnNext.className = 'tutorial-btn-next';
         btnNext.textContent = currentStep === STEPS.length - 1 ? '완료' : '다음';
-        btnNext.addEventListener('click', () => {
+        btnNext.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             currentStep += 1;
             if (currentStep >= STEPS.length) {
+                console.log('✅ 튜토리얼 완료');
                 clear();
             } else {
+                console.log('➡️ 다음 단계로');
                 renderStep();
             }
         });
@@ -774,9 +832,13 @@ const Tutorial = (() => {
         actions.appendChild(btnSkip);
         actions.appendChild(btnNext);
 
+        tooltipEl.appendChild(progress);
         tooltipEl.appendChild(title);
         tooltipEl.appendChild(body);
         tooltipEl.appendChild(actions);
+
+        // 타겟 위치 설정 및 스크롤 (이 함수가 스크롤과 위치 조정을 모두 처리)
+        positionForTarget(target);
     };
 
     const start = () => {
@@ -785,11 +847,11 @@ const Tutorial = (() => {
     };
 
     const startLearnMore = () => {
-        // "더 알아보기"는 같은 스텝이지만 설명 문구만 약간 다르게
-        STEPS[0].body = '시간표 관리 기능으로 주간 수업 일정을 한눈에 확인할 수 있어요.';
-        STEPS[1].body = '과제 추적 기능으로 마감일과 진행 상태를 쉽게 관리해요.';
-        STEPS[2].body = '필기 노트는 수업 내용을 정리하고 복습할 때 유용해요.';
-        STEPS[3].body = '클럽 활동 기능은 동아리 일정과 공지를 관리할 수 있도록 준비 중이에요.';
+        // "더 알아보기"는 설명 문구를 조금 더 소개용 톤으로 변경
+        STEPS[0].body = '시간표 관리에서는 주간 수업 일정을 한 번에 확인하고 수정할 수 있어요.';
+        STEPS[1].body = '과제 추적에서는 과제의 마감일과 D-DAY를 관리하며, 대시보드와 알림에서 확인할 수 있어요.';
+        STEPS[2].body = '필기 노트에서는 수업별로 내용을 기록하고, 최근 노트를 홈 화면에서 바로 확인할 수 있어요.';
+        STEPS[3].body = '클럽 활동은 동아리 일정과 공지를 관리할 수 있도록 확장될 기능이에요.';
         start();
     };
 
@@ -1627,13 +1689,87 @@ const App = {
                 }
             });
         });
+
+        // 알림 아이콘 버튼 연결
+        const notificationBtn = document.querySelector('.header-actions .icon-btn .ri-notification-line')?.parentElement;
+        if (notificationBtn) {
+            EventManager.on(notificationBtn, 'click', (e) => {
+                e.preventDefault();
+                Notifications.toggle();
+            });
+        }
+
+        // Hero 버튼 동작: 시작하기 / 더 알아보기
+        const btnGetStarted = document.getElementById('btn-get-started');
+        if (btnGetStarted) {
+            console.log('✅ 시작하기 버튼 이벤트 연결 성공');
+            EventManager.on(btnGetStarted, 'click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🚀 시작하기 버튼 클릭됨!');
+                
+                // 대시보드 섹션 표시
+                navBtns.forEach(b => b.classList.remove('active'));
+                sections.forEach(s => {
+                    s.classList.toggle('hidden', s.id !== 'dashboard');
+                });
+                State.ui.activeSection = 'dashboard';
+                App.handleSectionChange('dashboard');
+
+                // 기능 카드 영역으로 스크롤 (화면 중앙에 배치)
+                const featureArea = document.querySelector('.feature-cards');
+                if (featureArea) {
+                    featureArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                // 튜토리얼 시작 (스크롤 완료 대기)
+                setTimeout(() => {
+                    console.log('📚 튜토리얼 시작!');
+                    Tutorial.start();
+                }, 1000);
+            });
+        } else {
+            console.error('❌ 시작하기 버튼을 찾을 수 없음!');
+        }
+
+        const btnLearnMore = document.getElementById('btn-learn-more');
+        if (btnLearnMore) {
+            console.log('✅ 더 알아보기 버튼 이벤트 연결 성공');
+            EventManager.on(btnLearnMore, 'click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('📖 더 알아보기 버튼 클릭됨!');
+                
+                // 대시보드 섹션 표시
+                navBtns.forEach(b => b.classList.remove('active'));
+                sections.forEach(s => {
+                    s.classList.toggle('hidden', s.id !== 'dashboard');
+                });
+                State.ui.activeSection = 'dashboard';
+                App.handleSectionChange('dashboard');
+
+                // 기능 카드 영역으로 스크롤 (화면 중앙에 배치)
+                const featureArea = document.querySelector('.feature-cards');
+                if (featureArea) {
+                    featureArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                // 소개용 튜토리얼 시작 (스크롤 완료 대기)
+                setTimeout(() => {
+                    console.log('📚 소개 튜토리얼 시작!');
+                    Tutorial.startLearnMore();
+                }, 1000);
+            });
+        } else {
+            console.error('❌ 더 알아보기 버튼을 찾을 수 없음!');
+        }
     },
     
     handleSectionChange: (section) => {
         switch (section) {
             case 'dashboard':
                 // 대시보드 데이터 새로고침
-                Components.Dashboard.refresh();
+                Components.Dashboard.render();
                 break;
             case 'assignments':
                 Components.Assignment.renderCalendar();
@@ -2175,16 +2311,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 메인 시간표 렌더링
     renderMainTimetable();
     
-    // 랜딩 인터랙션: 스크롤 리빌 및 히어로 버튼 동작
+    // 랜딩 인터랙션: 스크롤 리빌
+    // 주의: 히어로 버튼 이벤트는 App.setupNavigation()에서 처리하므로 여기서 중복 등록 금지
     try {
-        const primaryBtn = document.querySelector('.btn-hero-primary');
-        if (primaryBtn) {
-            primaryBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = document.querySelector('#schedule');
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
-            });
-        }
 
         const toReveal = [
             ...document.querySelectorAll('.feature-card'),
