@@ -75,19 +75,22 @@
                  중앙 정렬된 큰 제목과 설명, 버튼들
                  ========================================== -->
             <div class="hero-section hero-bg">
-                <h1 class="hero-title">학교 생활을 더 스마트하게</h1>
-                <p class="hero-description">
-                    시간표 관리부터 과제 추적까지, 학생들의 학교 생활을 체계적으로 도와주는 올인원 플랫폼입니다.
-                </p>
-                <div class="hero-buttons">
-                    <button class="btn-hero-primary">
-                        <i class="ri-play-circle-line"></i>
-                        시작하기
-                    </button>
-                    <button class="btn-hero-secondary">
-                        <i class="ri-information-line"></i>
-                        더 알아보기
-                    </button>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <h1 class="hero-title">학교 생활을 더 스마트하게</h1>
+                    <p class="hero-description">
+                        시간표 관리부터 과제 추적까지, 학생들의 학교 생활을 체계적으로 도와주는 올인원 플랫폼입니다.
+                    </p>
+                    <div class="hero-buttons">
+                        <button id="btn-get-started" class="btn-hero-primary">
+                            <i class="ri-play-circle-line"></i>
+                            시작하기
+                        </button>
+                        <button id="btn-learn-more" class="btn-hero-secondary">
+                            <i class="ri-information-line"></i>
+                            더 알아보기
+                        </button>
+                    </div>
                 </div>
                 <div class="hero-visual" aria-hidden="true">
                     <div class="blob"></div>
@@ -140,7 +143,12 @@
             <!-- ==========================================
                  통계 섹션 - 이번 주 학습 현황
                  ========================================== -->
-            <div class="stats-section">
+            <div class="dashboard-card" style="margin-top: 20px;">
+                <h3><i class="ri-book-2-line"></i> 최근 노트</h3>
+                <div id="dashboard-recent-notes"></div>
+            </div>
+
+            <div class="stats-section" style="margin-top: 20px;">
                 <h3 class="stats-title">이번 주 학습 현황</h3>
                 <div class="stats-grid">
                     <div class="stat-item">
@@ -156,12 +164,6 @@
                         <div class="stat-label">과제 남은 시간</div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- 최근 노트 요약 -->
-            <div class="dashboard-card" style="margin-top:20px;">
-                <h3><i class="ri-book-2-line"></i> 최근 노트</h3>
-                <div id="dashboard-recent-notes"></div>
             </div>
 
             <!-- 기존 대시보드 카드 (숨김 처리 또는 제거 가능) -->

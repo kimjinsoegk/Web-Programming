@@ -198,6 +198,123 @@
     border-radius: var(--radius-md);
 }
 
+/* Hero section overlay & content alignment 개선 */
+.hero-section {
+    position: relative;
+    overflow: hidden;
+    color: #ffffff;
+}
+
+.hero-section .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18), transparent 55%),
+                linear-gradient(135deg, rgba(15,23,42,0.85), rgba(15,23,42,0.6));
+    mix-blend-mode: multiply;
+    pointer-events: none;
+}
+
+.hero-section .hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-title {
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    text-shadow: 0 10px 25px rgba(15,23,42,0.6);
+}
+
+.hero-description {
+    font-weight: 500;
+    text-shadow: 0 4px 12px rgba(15,23,42,0.7);
+}
+
+.hero-buttons .btn-hero-primary,
+.hero-buttons .btn-hero-secondary {
+    box-shadow: 0 10px 25px rgba(15,23,42,0.45);
+}
+
+.hero-buttons .btn-hero-primary:hover,
+.hero-buttons .btn-hero-secondary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 18px 35px rgba(15,23,42,0.55);
+}
+
+/* 튜토리얼 오버레이 */
+.tutorial-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+}
+
+.tutorial-highlight {
+    position: fixed;
+    z-index: 41;
+    pointer-events: none;
+    box-shadow: 0 0 0 9999px rgba(15,23,42,0.65);
+    border-radius: 16px;
+    transition: var(--transition);
+}
+
+.tutorial-tooltip {
+    position: fixed;
+    z-index: 42;
+    max-width: 320px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: var(--shadow-xl);
+    color: var(--text-primary);
+}
+
+.tutorial-tooltip-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.tutorial-tooltip-body {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.tutorial-tooltip-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.tutorial-btn-skip {
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.tutorial-btn-next {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.tutorial-btn-next:hover {
+    background: var(--primary-hover);
+}
+
 /* 요일 선택 체크박스 개선 */
 .day-selection {
     margin: var(--spacing-md) 0;
