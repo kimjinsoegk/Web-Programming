@@ -762,20 +762,14 @@ const Tutorial = (() => {
         
         // 타겟 요소 위치를 기준으로 clip-path 설정
         const rect = target.getBoundingClientRect();
-        const topRect = rect.top + window.scrollY - 8;
+        // Fixed Overlay이므로 Viewport 기준 좌표 사용 (window.scrollY 제거)
+        const topRect = rect.top - 8;
         const leftRect = rect.left - 8;
         const rightRect = rect.left + rect.width + 8;
-        const bottomRect = rect.top + window.scrollY + rect.height + 8;
+        const bottomRect = rect.top + rect.height + 8;
         
-        // clip-path로 오버레이에 구멍 뚫기
-        overlay.style.clipPath = `polygon(
-            0% 0%, 0% 100%, 100% 100%, 100% 0%, 0% 0%,
-            ${leftRect}px ${topRect}px,
-            ${rightRect}px ${topRect}px,
-            ${rightRect}px ${bottomRect}px,
-            ${leftRect}px ${bottomRect}px,
-            ${leftRect}px ${topRect}px
-        )`;
+        // clip-path 제거 (CSS box-shadow로 대체)
+        overlay.style.clipPath = 'none';
 
         // 툴팁 생성 및 내용 설정
         if (!tooltipEl) {
@@ -1763,6 +1757,49 @@ const App = {
         } else {
             console.error('❌ 더 알아보기 버튼을 찾을 수 없음!');
         }
+
+        // Footer Navigation Setup
+        const footerTutorialLink = document.getElementById('footer-tutorial-link');
+        if (footerTutorialLink) {
+            EventManager.on(footerTutorialLink, 'click', (e) => {
+                e.preventDefault();
+                // Scroll to feature cards first
+                const featureArea = document.querySelector('.feature-cards');
+                if (featureArea) {
+                    featureArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                setTimeout(() => {
+                    Tutorial.start();
+                }, 800);
+            });
+        }
+
+        const footerNavLinks = document.querySelectorAll('.footer-nav-link');
+        footerNavLinks.forEach(link => {
+            EventManager.on(link, 'click', (e) => {
+                e.preventDefault();
+                const target = link.dataset.target;
+                
+                // Update active state in header nav
+                navBtns.forEach(b => {
+                    if (b.dataset.section === target) {
+                        b.classList.add('active');
+                    } else {
+                        b.classList.remove('active');
+                    }
+                });
+
+                // Switch section
+                State.ui.activeSection = target;
+                sections.forEach(s => {
+                    s.classList.toggle('hidden', s.id !== target);
+                });
+                App.handleSectionChange(target);
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
     },
     
     handleSectionChange: (section) => {
