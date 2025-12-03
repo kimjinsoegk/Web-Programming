@@ -243,11 +243,7 @@
 
 /* 튜토리얼 오버레이 - 전체 어두운 배경 (낮은 z-index) */
 .tutorial-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 9998;
-    pointer-events: none;
+    display: none; /* 하이라이트 박스의 그림자로 대체됨 */
 }
 
 /* 튜토리얼 하이라이트 - 설명되는 요소를 밝게 */
@@ -258,7 +254,7 @@
     background: transparent;
     border: 3px solid rgba(79,70,229,0.9);
     border-radius: 16px;
-    box-shadow: 0 0 0 4px rgba(79,70,229,0.2);
+    box-shadow: 0 0 0 4px rgba(79,70,229,0.2), 0 0 0 9999px rgba(0, 0, 0, 0.75);
     transition: all 0.3s ease;
 }
 
@@ -1509,6 +1505,20 @@ button.success:hover {
     padding: 8px 16px;
     font-size: 13px;
 }
+/* 드래그 선택 스타일 */
+.schedule-cell {
+    user-select: none; /* 텍스트 선택 방지 */
+}
+
+.schedule-cell.drag-selected {
+    background-color: rgba(79, 70, 229, 0.2) !important;
+    border: 2px dashed var(--primary);
+}
+
+.schedule-cell.drag-start {
+    background-color: rgba(79, 70, 229, 0.3) !important;
+}
+
 /* 시간표 그리드 개선 - 더 깔끔하고 모던하게 */
 .schedule-table {
     width: 100%;
@@ -1667,43 +1677,49 @@ button.success:hover {
 /* Make assignments calendar large and prominent */
 .assignments-calendar {
     margin: 0 auto 24px auto;
-    max-width: 700px;
+    width: 100%;
     min-width: 320px;
-    min-height: 420px;
+    min-height: 600px;
     box-shadow: 0 2px 16px rgba(0,0,0,0.08);
     font-size: 15px;
 }
 .assign-calendar-header{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:6px}
-.assign-calendar-header .cell.head{background:#f3f7ff; padding:6px; text-align:center; border-radius:6px}
+.assign-calendar-header .cell.head{background:#f3f7ff; padding:12px; text-align:center; border-radius:6px; font-weight: 600;}
 .assign-calendar-grid{display:block}
 .assign-calendar-cells{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
-.assign-calendar-cells .cell{background:#fff; min-height:80px; border:1px solid #f1f5fb; border-radius:6px; padding:6px; position:relative}
+.assign-calendar-cells .cell{background:#fff; min-height:120px; border:1px solid #f1f5fb; border-radius:6px; padding:6px; position:relative}
 .assign-calendar-cells .cell.empty{background:transparent; border:none}
-.assign-calendar-cells .day-num{position:absolute; top:6px; left:6px; font-size:12px; color:var(--muted)}
+.assign-calendar-cells .day-num{position:absolute; top:8px; left:8px; font-size:14px; font-weight: 600; color:var(--muted)}
 .assign-badge{display:block; margin-top:22px; padding:6px; border-radius:6px; color:#fff; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer}
 
 /* assignment bar for calendar */
 .assign-bar {
     display: block;
-    position: absolute;
-    left: 6px;
-    right: 6px;
-    bottom: 6px;
-    height: 8px;
+    position: relative;
+    margin-top: 24px;
+    margin-bottom: 4px;
+    height: 20px;
     border-radius: 4px;
-    opacity: 0.85;
-    font-size: 10px;
+    opacity: 0.9;
+    font-size: 12px;
     color: #fff;
     cursor: pointer;
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    font-size: 11px;
     padding-left: 6px;
+    transition: transform 0.1s;
+}
+.assign-bar:hover {
+    transform: scale(1.02);
+    z-index: 10;
+}
+.assign-bar + .assign-bar {
+    margin-top: 4px;
 }
 .bar-title {
-    font-size: 11px;
+    font-size: 12px;
     color: #fff;
     font-weight: 500;
     white-space: nowrap;
@@ -1993,10 +2009,12 @@ button.success:hover {
     border: 1px solid #d1d5db;
     border-radius: 4px;
     font-size: 14px;
+    background: white;
+    color: var(--text-primary);
 }
 
 .save-section button {
-    background: var(--accent);
+    background: var(--primary);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -2007,12 +2025,12 @@ button.success:hover {
 }
 
 .save-section button:hover {
-    background: #1d5aa6;
+    background: var(--primary-hover);
 }
 
 .saved-schedules-list h4 {
     margin: 0 0 15px 0;
-    color: #374151;
+    color: var(--text-primary);
     font-size: 16px;
     font-weight: 600;
 }
@@ -2034,13 +2052,13 @@ button.success:hover {
 
 .schedule-name {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text-primary);
     margin-bottom: 4px;
 }
 
 .schedule-meta {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--text-muted);
 }
 
 .schedule-actions {
@@ -2053,6 +2071,7 @@ button.success:hover {
     border: 1px solid #d1d5db;
     border-radius: 4px;
     background: white;
+    color: var(--text-secondary);
     cursor: pointer;
     font-size: 12px;
 }
@@ -2664,6 +2683,232 @@ button.success:hover {
     font-size: 13px;
 }
 
+/* 시간표 리스트 뷰 스타일 */
+.schedule-list-view {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    padding: var(--spacing-lg);
+    min-height: 400px;
+}
+
+.timetable-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.timetable-day-header {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border-light);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timetable-day-header::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 18px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.schedule-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+    transition: var(--transition);
+    border: 1px solid var(--border-light);
+}
+
+.schedule-item:hover {
+    transform: translateX(4px);
+    background: white;
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+.schedule-item-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.schedule-time {
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+}
+
+.schedule-item-center {
+    flex: 1;
+    padding: 0 16px;
+}
+
+.schedule-item-right {
+    display: flex;
+    align-items: center;
+}
+
+.btn-delete-item {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 18px;
+}
+
+.btn-delete-item:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+    transform: scale(1.1);
+}
+
+.schedule-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.schedule-location {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* 과제 리스트 아이템 스타일 */
+.assignment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+    transition: var(--transition);
+    border: 1px solid var(--border-light);
+}
+
+.assignment-item:hover {
+    transform: translateX(4px);
+    background: white;
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+.assignment-item.completed {
+    opacity: 0.6;
+    background: var(--bg-main);
+}
+
+.assignment-item.completed .assignment-title {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.assignment-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.assignment-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.assignment-center {
+    flex: 1;
+    padding: 0 16px;
+}
+
+.assignment-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    transition: var(--transition);
+}
+
+.assignment-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.assignment-dday {
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+}
+
+.assignment-dday.urgent {
+    color: var(--danger);
+    background: var(--danger-light);
+    border-color: var(--danger-light);
+}
+
+.assignment-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 18px;
+}
+
+.btn-icon:hover {
+    background: var(--bg-main);
+    color: var(--primary);
+}
+
+.btn-icon.delete:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
 /* 빈 상태 메시지 */
 .empty-message,
 .empty-state {
@@ -2849,4 +3094,476 @@ button.success:hover {
     }
     .site-footer .footer-contact li { justify-content: center; }
 }
+
+/* 시간표 상단 도구 모음 */
+.schedule-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    background: var(--bg-card);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+}
+
+.schedule-guide {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.guide-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.guide-text strong {
+    display: block;
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.guide-text p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.schedule-actions .btn-danger-text {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition);
+}
+
+.schedule-actions .btn-danger-text:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+    border-color: var(--danger-light);
+}
  
+
+/* ==========================================
+   ���� ������ ������ ��Ÿ��
+   ========================================== */
+
+.assignments-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .assignments-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    padding: 24px;
+    transition: var(--transition);
+}
+
+.card.h-full {
+    height: 100%;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-header h3 i {
+    color: var(--primary);
+    font-size: 20px;
+}
+
+/* ����Ʈ ���� ��ũ�� Ŀ���� */
+.custom-scrollbar {
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 20px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-light);
+}
+
+/* ���� ������ ��Ÿ�� ���� */
+.assignment-item {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.assignment-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.assignment-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+.assignment-item:hover::before {
+    opacity: 1;
+}
+
+.assignment-item.completed {
+    background: var(--bg-secondary);
+    opacity: 0.8;
+}
+
+.assignment-item.completed .assignment-title {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.assignment-left {
+    display: flex;
+    align-items: center;
+}
+
+.assignment-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.assignment-center {
+    flex: 1;
+    min-width: 0; /* �ؽ�Ʈ ������ ���� */
+}
+
+.assignment-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.assignment-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.assignment-dday {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+}
+
+.assignment-dday.urgent {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.assignment-right {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.assignment-item:hover .assignment-right {
+    opacity: 1;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: var(--bg-secondary);
+    color: var(--primary);
+}
+
+.btn-icon.delete:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+/* �� ���� ��Ÿ�� */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    color: var(--border);
+    margin-bottom: 8px;
+}
+
+.empty-state-text {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.empty-state-sub {
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+
+/* ==========================================
+   ��Ʈ ������ ������ ��Ÿ��
+   ========================================== */
+
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    padding-bottom: 40px;
+}
+
+.note-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    height: 280px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.note-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
+}
+
+.note-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary), #818cf8);
+    opacity: 0.8;
+}
+
+.note-header {
+    margin-bottom: 16px;
+}
+
+.note-class-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.note-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.4;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.note-preview {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+}
+
+.note-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light);
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.note-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.note-card:hover .note-actions {
+    opacity: 1;
+}
+
+/* �˻��� ��Ÿ�� */
+.search-box {
+    position: relative;
+    width: 240px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: 16px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 14px;
+    transition: var(--transition);
+    background: white;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+    width: 280px;
+}
+
+/* ���� Ĩ ��Ÿ�� */
+.notes-filter-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.filter-chip {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.filter-chip:hover {
+    background: var(--bg-secondary);
+}
+
+.filter-chip.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+

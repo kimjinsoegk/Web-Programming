@@ -197,99 +197,34 @@
                 <!-- JavaScript로 렌더링됨 -->
             </div>
             
-            <form id="schedule-form" class="form">
-                <input type="text" id="class-name" placeholder="수업명" required>
-                
-                <!-- 간단한 요일 선택 -->
-                <div class="day-selection">
-                    <label>요일 선택:</label>
-                    <div class="day-checkboxes">
-                        <label class="day-checkbox">
-                            <input type="checkbox" name="class-days" value="월"> 월
-                        </label>
-                        <label class="day-checkbox">
-                            <input type="checkbox" name="class-days" value="화"> 화
-                        </label>
-                        <label class="day-checkbox">
-                            <input type="checkbox" name="class-days" value="수"> 수
-                        </label>
-                        <label class="day-checkbox">
-                            <input type="checkbox" name="class-days" value="목"> 목
-                        </label>
-                        <label class="day-checkbox">
-                            <input type="checkbox" name="class-days" value="금"> 금
-                        </label>
-                        <label class="day-checkbox">
-                            <input type="checkbox" name="class-days" value="토"> 토
-                        </label>
-                        <label class="day-checkbox">
-                            <input type="checkbox" name="class-days" value="일"> 일
-                        </label>
+            <!-- 시간표 상단 도구 모음 -->
+            <div class="schedule-toolbar">
+                <div class="schedule-guide">
+                    <div class="guide-icon">
+                        <i class="ri-drag-move-2-line"></i>
+                    </div>
+                    <div class="guide-text">
+                        <strong>드래그하여 추가하기</strong>
+                        <p>시간표의 빈 칸을 드래그하여 수업을 쉽고 빠르게 등록하세요.</p>
                     </div>
                 </div>
-                
-                <!-- 시간 입력 -->
-                <div class="time-inputs">
-                    <label class="time-select">시작: 
-                        <select id="start-hour">
-                            <option value="07" selected>07</option>
-                            <option value="08">08</option>
-                            <option value="09">09</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                            <option value="13">13</option>
-                            <option value="14">14</option>
-                            <option value="15">15</option>
-                            <option value="16">16</option>
-                            <option value="17">17</option>
-                            <option value="18">18</option>
-                            <option value="19">19</option>
-                            <option value="20">20</option>
-                        </select>
-                        :
-                        <select id="start-min">
-                            <option value="00" selected>00</option>
-                            <option value="30">30</option>
-                        </select>
-                    </label>
-
-                    <label class="time-select">종료: 
-                        <select id="end-hour">
-                            <option value="07">07</option>
-                            <option value="08" selected>08</option>
-                            <option value="09">09</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                            <option value="13">13</option>
-                            <option value="14">14</option>
-                            <option value="15">15</option>
-                            <option value="16">16</option>
-                            <option value="17">17</option>
-                            <option value="18">18</option>
-                            <option value="19">19</option>
-                            <option value="20">20</option>
-                        </select>
-                        :
-                        <select id="end-min">
-                            <option value="00" selected>00</option>
-                            <option value="30">30</option>
-                        </select>
-                    </label>
+                <div class="schedule-actions">
+                    <button type="button" id="view-toggle-btn" class="btn-secondary">
+                        <i class="ri-list-check"></i> 리스트로 보기
+                    </button>
+                    <button type="button" id="clear-schedules" class="btn-danger-text">
+                        <i class="ri-delete-bin-line"></i> 전체 초기화
+                    </button>
                 </div>
-                
-                <input type="text" id="location" placeholder="장소 (선택)">
-                <label class="color-label">블록 색상: <input type="color" id="class-color" value="#2b6ef6"></label>
-                
-                <button type="submit">추가</button>
-                <button type="button" id="clear-schedules" class="danger">전체 삭제</button>
-            </form>
+            </div>
 
             <!-- 새: 주간 시간표 (CSS Grid 기반) -->
             <div class="table-wrap">
                 <div id="schedule-grid" class="schedule-grid">
                     <!-- grid content rendered by JS -->
+                </div>
+                <div id="schedule-list-view" class="schedule-list-view hidden">
+                    <!-- list content rendered by JS -->
                 </div>
             </div>
 
@@ -301,66 +236,45 @@
                 </div>
             </div>
             
-            <!-- 시간표 수정 모달 -->
-            <div id="schedule-edit-modal" class="modal" style="display: none;">
+            <!-- 시간표 추가/수정 공용 모달 -->
+            <div id="schedule-modal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>시간표 수정</h3>
+                        <h3 id="modal-title">수업 정보</h3>
                         <button class="modal-close">&times;</button>
                     </div>
-                    <form id="schedule-edit-form" class="modal-form">
-                        <input type="hidden" id="edit-schedule-id">
-                        <input type="text" id="edit-class-name" placeholder="수업명" required>
-                        <input type="text" id="edit-location" placeholder="장소 (선택)">
-                        <div class="edit-time-row">
-                            <label>시작:</label>
-                            <select id="edit-start-hour">
-                                <option value="07">07</option>
-                                <option value="08">08</option>
-                                <option value="09">09</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
-                                <option value="16">16</option>
-                                <option value="17">17</option>
-                                <option value="18">18</option>
-                                <option value="19">19</option>
-                                <option value="20">20</option>
-                            </select>
-                            :
-                            <select id="edit-start-min">
-                                <option value="00">00</option>
-                                <option value="30">30</option>
-                            </select>
-                            
-                            <label>종료:</label>
-                            <select id="edit-end-hour">
-                                <option value="07">07</option>
-                                <option value="08">08</option>
-                                <option value="09">09</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
-                                <option value="16">16</option>
-                                <option value="17">17</option>
-                                <option value="18">18</option>
-                                <option value="19">19</option>
-                                <option value="20">20</option>
-                            </select>
-                            :
-                            <select id="edit-end-min">
-                                <option value="00">00</option>
-                                <option value="30">30</option>
+                    <form id="schedule-modal-form" class="modal-form">
+                        <input type="hidden" id="modal-mode" value="create"> <!-- create or edit -->
+                        <input type="hidden" id="modal-schedule-id">
+                        
+                        <input type="text" id="modal-class-name" placeholder="수업명" required>
+                        <input type="text" id="modal-location" placeholder="장소 (선택)">
+                        
+                        <!-- 요일 선택 (추가 모드일 때만 수정 가능하도록 할 수도 있음) -->
+                        <div class="modal-row" style="margin-bottom: 12px;">
+                            <label style="font-weight:600; font-size:14px; margin-right:8px;">요일:</label>
+                            <select id="modal-day" style="padding:6px; border-radius:4px; border:1px solid #ddd;">
+                                <option value="월">월요일</option>
+                                <option value="화">화요일</option>
+                                <option value="수">수요일</option>
+                                <option value="목">목요일</option>
+                                <option value="금">금요일</option>
+                                <option value="토">토요일</option>
+                                <option value="일">일요일</option>
                             </select>
                         </div>
+
+                        <div class="edit-time-row">
+                            <label>시작:</label>
+                            <select id="modal-start-hour"></select>:
+                            <select id="modal-start-min"></select>
+                            
+                            <label>종료:</label>
+                            <select id="modal-end-hour"></select>:
+                            <select id="modal-end-min"></select>
+                        </div>
                         
-                        <label class="color-label">블록 색상: <input type="color" id="edit-class-color"></label>
+                        <label class="color-label">블록 색상: <input type="color" id="modal-class-color"></label>
                         
                         <div class="modal-buttons">
                             <button type="submit" class="btn-primary">저장</button>
@@ -372,39 +286,147 @@
         </section>
 
         <section id="assignments" class="section hidden">
-            <h2>과제 관리</h2>
-                <div class="assignments-grid">
-                    <div id="assignments-calendar" class="assignments-calendar">로딩 중...</div>
-                    <form id="assignment-form" class="form">
-                        <input type="text" id="assignment-title" placeholder="과제 제목" required>
-                        <select id="assignment-class">
-                            <option value="">수업 선택 (선택사항)</option>
-                        </select>
-                        <label>시작일: <input type="date" id="assignment-start" required></label>
-                        <label>마감일: <input type="date" id="assignment-end" required></label>
-                        <label>색상: <input type="color" id="assignment-color" value="#ff8a65"></label>
-                        <textarea id="assignment-notes" placeholder="세부 내용"></textarea>
-                        <button type="submit">추가</button>
-                    </form>
-                    <div id="assignments-list" class="list">로딩 중...</div>
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h2><i class="ri-task-line"></i> 과제 관리</h2>
+            </div>
+
+            <div class="assignments-layout">
+                <!-- Left Column: Calendar -->
+                <div class="assignments-main">
+                    <div class="card h-full">
+                        <div class="card-header">
+                            <h3><i class="ri-calendar-event-line"></i> 월간 일정</h3>
+                        </div>
+                        <div id="assignments-calendar" class="assignments-calendar">로딩 중...</div>
+                    </div>
                 </div>
+                
+                <!-- Right Column: List -->
+                <div class="assignments-side">
+                    <div class="card h-full">
+                        <div class="card-header">
+                            <h3><i class="ri-list-check-2"></i> 할 일 목록</h3>
+                            <button id="btn-add-assignment" class="btn-primary" style="padding: 6px 12px; font-size: 13px;">
+                                <i class="ri-add-line"></i> 추가
+                            </button>
+                        </div>
+                        <div id="assignments-list" class="list custom-scrollbar">로딩 중...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 과제 추가/수정 모달 -->
+            <div id="assignment-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="assignment-modal-title">과제 정보</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <form id="assignment-modal-form" class="modal-form">
+                        <input type="hidden" id="assignment-modal-mode" value="create">
+                        <input type="hidden" id="assignment-modal-id">
+                        
+                        <input type="text" id="assignment-modal-title" placeholder="과제 제목" required>
+                        
+                        <div class="modal-row" style="margin-bottom: 12px;">
+                            <label style="font-weight:600; font-size:14px; margin-right:8px;">수업:</label>
+                            <select id="assignment-modal-class" style="padding:6px; border-radius:4px; border:1px solid #ddd; flex:1;">
+                                <option value="">수업 선택 (선택사항)</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-row" style="margin-bottom: 12px; display:flex; gap:12px;">
+                            <label style="flex:1;">
+                                <span style="display:block; font-weight:600; font-size:14px; margin-bottom:4px;">시작일</span>
+                                <input type="date" id="assignment-modal-start" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" required>
+                            </label>
+                            <label style="flex:1;">
+                                <span style="display:block; font-weight:600; font-size:14px; margin-bottom:4px;">마감일</span>
+                                <input type="date" id="assignment-modal-end" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" required>
+                            </label>
+                        </div>
+                        
+                        <label class="color-label">색상: <input type="color" id="assignment-modal-color" value="#ff8a65"></label>
+                        
+                        <textarea id="assignment-modal-notes" placeholder="세부 내용" style="width:100%; height:100px; padding:8px; border:1px solid #ddd; border-radius:4px; margin-top:12px;"></textarea>
+                        
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn-primary">저장</button>
+                            <button type="button" class="btn-cancel">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 노트 추가/수정 모달 -->
+            <div id="note-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="note-modal-title">노트 작성</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <form id="note-modal-form" class="modal-form">
+                        <input type="hidden" id="note-modal-mode" value="create">
+                        <input type="hidden" id="note-modal-id">
+                        
+                        <div class="modal-row" style="margin-bottom: 12px;">
+                            <select id="note-modal-class" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border);" required>
+                                <option value="">수업 선택</option>
+                            </select>
+                        </div>
+
+                        <input type="text" id="note-modal-title" placeholder="노트 제목" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px; font-weight: 600;" required>
+                        
+                        <textarea id="note-modal-content" placeholder="내용을 입력하세요..." style="width:100%; height:300px; padding:12px; border:1px solid var(--border); border-radius:8px; resize: vertical; line-height: 1.6;" required></textarea>
+                        
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn-primary">저장</button>
+                            <button type="button" class="btn-cancel">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </section>
 
         <section id="notes" class="section hidden">
-            <h2>필기 / 노트</h2>
-            <form id="note-form" class="form">
-                <!-- 변경: 수업 선택을 위한 select (JS로 옵션 채움) -->
-                <select id="note-class" required>
-                    <option value="">수업 선택</option>
-                </select>
-                <input type="text" id="note-title" placeholder="노트 제목" required>
-                <textarea id="note-content" placeholder="내용" required></textarea>
-                <button type="submit">저장</button>
-            </form>
-            <div id="notes-list" class="list">로딩 중...</div>
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h2><i class="ri-book-2-line"></i> 필기 노트</h2>
+                <div class="header-controls" style="display: flex; gap: 12px;">
+                    <div class="search-box">
+                        <i class="ri-search-line"></i>
+                        <input type="text" id="note-search" placeholder="노트 검색...">
+                    </div>
+                    <button id="btn-add-note" class="btn-primary">
+                        <i class="ri-add-line"></i> 새 노트 작성
+                    </button>
+                </div>
+            </div>
+
+            <!-- 노트 필터/태그 영역 (추후 확장 가능) -->
+            <div class="notes-filter-bar" style="margin-bottom: 20px; display: none;">
+                <button class="filter-chip active">전체</button>
+                <!-- JS로 수업별 필터 생성 -->
+            </div>
+
+            <div id="notes-grid" class="notes-grid">
+                <!-- JS로 렌더링 -->
+                <div class="loading">로딩 중...</div>
+            </div>
         </section>
 
-        
+        <!-- 클럽 활동 섹션 (준비 중) -->
+        <section id="club" class="section hidden">
+            <div class="empty-state" style="padding: 100px 0;">
+                <div class="empty-state-icon" style="font-size: 64px; color: var(--primary-light); margin-bottom: 24px;">
+                    <i class="ri-group-line"></i>
+                </div>
+                <h2>클럽 활동 기능은 준비 중입니다</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 32px;">동아리 일정과 공지사항을 관리하는 기능이 곧 업데이트될 예정입니다.</p>
+                <button class="btn-secondary" onclick="document.getElementById('logo-home').click()">
+                    홈으로 돌아가기
+                </button>
+            </div>
+        </section>
 
     </main>
 

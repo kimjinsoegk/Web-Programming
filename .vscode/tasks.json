@@ -13,6 +13,15 @@
 				"$eslint-stylish"
 			],
 			"group": "test"
+		},
+		{
+			"label": "css-update",
+			"type": "shell",
+			"command": "echo \"CSS Update\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }

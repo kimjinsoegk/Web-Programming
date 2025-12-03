@@ -952,12 +952,15 @@ const Components = {
                         Components.Schedule.isTimeInSlot(s.start, s.end, timeSlot)
                     );
                     
+                    // 드래그 기능을 위한 데이터 속성 추가
+                    const cellAttrs = `data-day="${day}" data-time="${timeSlot}"`;
+                    
                     if (daySchedule) {
                         const isBlockStart = Components.Schedule.isBlockStart(daySchedule, timeSlot);
                         const currentDayClass = isCurrentDay ? 'current-day-schedule' : '';
                         
                         if (isBlockStart) {
-                            gridHTML += `<div class="schedule-cell has-class ${currentDayClass}" 
+                            gridHTML += `<div class="schedule-cell has-class ${currentDayClass}" ${cellAttrs}
                                 style="background-color: ${daySchedule.color}20; 
                                        border-left: 3px solid ${daySchedule.color};">
                                 <div class="class-name">${Utils.escapeHtml(daySchedule.name)}</div>
@@ -965,13 +968,13 @@ const Components = {
                                 <div class="class-location">${Utils.escapeHtml(daySchedule.location || '')}</div>
                             </div>`;
                         } else {
-                            gridHTML += `<div class="schedule-cell has-class block-continue ${currentDayClass}" 
+                            gridHTML += `<div class="schedule-cell has-class block-continue ${currentDayClass}" ${cellAttrs}
                                 style="background-color: ${daySchedule.color}20; 
                                        border-left: 3px solid ${daySchedule.color};">
                             </div>`;
                         }
                     } else {
-                        gridHTML += '<div class="schedule-cell"></div>';
+                        gridHTML += `<div class="schedule-cell" ${cellAttrs}></div>`;
                     }
                 });
                 
@@ -980,6 +983,8 @@ const Components = {
             
             gridHTML += '</div>';
             grid.innerHTML = gridHTML;
+            
+            // 드래그 이벤트 연결 (대시보드용은 읽기 전용일 수 있으나, 여기서는 일단 연결하지 않음. 메인 시간표 페이지에서만 연결)
         },
         
         setupScheduleSetSelector: () => {
@@ -1109,12 +1114,15 @@ const Components = {
                         Components.Schedule.isTimeInSlot(s.start, s.end, timeSlot)
                     );
                     
+                    // 드래그용 데이터 속성
+                    const cellAttrs = `data-day="${day}" data-time="${timeSlot}"`;
+
                     if (daySchedule) {
                         const isBlockStart = Components.Schedule.isBlockStart(daySchedule, timeSlot);
                         
                         if (isBlockStart) {
                             // 블록 시작점에는 수업 정보 표시
-                            gridHTML += `<div class="schedule-cell has-class" 
+                            gridHTML += `<div class="schedule-cell has-class" ${cellAttrs}
                                 style="background-color: ${daySchedule.color}20; 
                                        border-left: 3px solid ${daySchedule.color};">
                                 <div class="class-name">${Utils.escapeHtml(daySchedule.name)}</div>
@@ -1123,13 +1131,13 @@ const Components = {
                             </div>`;
                         } else {
                             // 블록 중간/끝 부분에는 같은 색깔로만 채우기
-                            gridHTML += `<div class="schedule-cell has-class block-continue" 
+                            gridHTML += `<div class="schedule-cell has-class block-continue" ${cellAttrs}
                                 style="background-color: ${daySchedule.color}20; 
                                        border-left: 3px solid ${daySchedule.color};">
                             </div>`;
                         }
                     } else {
-                        gridHTML += '<div class="schedule-cell"></div>';
+                        gridHTML += `<div class="schedule-cell" ${cellAttrs}></div>`;
                     }
                 });
                 
@@ -1138,6 +1146,121 @@ const Components = {
             
             gridHTML += '</div>';
             grid.innerHTML = gridHTML;
+
+            // 드래그 이벤트 연결
+            Components.Schedule.setupDragEvents(grid);
+        },
+
+        setupDragEvents: (gridElement) => {
+            let isDragging = false;
+            let startCell = null;
+            let currentCell = null;
+
+            const getCellData = (el) => {
+                const cell = el.closest('.schedule-cell');
+                if (!cell) return null;
+                return {
+                    day: cell.dataset.day,
+                    time: cell.dataset.time,
+                    el: cell
+                };
+            };
+
+            const clearSelection = () => {
+                gridElement.querySelectorAll('.schedule-cell').forEach(c => {
+                    c.classList.remove('drag-selected', 'drag-start');
+                });
+            };
+
+            const getTimeIndex = (time) => {
+                const [h, m] = time.split(':').map(Number);
+                return h * 60 + m;
+            };
+
+            gridElement.addEventListener('mousedown', (e) => {
+                const data = getCellData(e.target);
+                if (!data) return;
+                
+                // 이미 수업이 있는 곳은 드래그 시작 불가 (수정은 클릭으로)
+                if (data.el.classList.contains('has-class')) {
+                    // 기존 수업 클릭 시 수정 모달 띄우기 (선택 사항)
+                    // const schedule = ScheduleService.getByTime(data.day, data.time);
+                    // if(schedule) App.editSchedule(schedule.id);
+                    return;
+                }
+
+                isDragging = true;
+                startCell = data;
+                currentCell = data;
+                
+                clearSelection();
+                data.el.classList.add('drag-start');
+                e.preventDefault(); // 텍스트 선택 방지
+            });
+
+            gridElement.addEventListener('mousemove', (e) => {
+                if (!isDragging || !startCell) return;
+                
+                const data = getCellData(e.target);
+                if (!data) return;
+
+                // 다른 요일로 넘어가면 무시 (같은 요일 내에서만 드래그 허용)
+                if (data.day !== startCell.day) return;
+
+                currentCell = data;
+                
+                // 선택 영역 하이라이트
+                const startTime = getTimeIndex(startCell.time);
+                const currTime = getTimeIndex(currentCell.time);
+                const minTime = Math.min(startTime, currTime);
+                const maxTime = Math.max(startTime, currTime);
+
+                gridElement.querySelectorAll(`.schedule-cell[data-day="${startCell.day}"]`).forEach(cell => {
+                    const t = getTimeIndex(cell.dataset.time);
+                    if (t >= minTime && t <= maxTime) {
+                        cell.classList.add('drag-selected');
+                    } else {
+                        cell.classList.remove('drag-selected');
+                    }
+                });
+            });
+
+            document.addEventListener('mouseup', (e) => {
+                if (!isDragging || !startCell) return;
+                
+                isDragging = false;
+                
+                // 드래그 종료 시점의 데이터 계산
+                const startTimeIdx = getTimeIndex(startCell.time);
+                const endTimeIdx = getTimeIndex(currentCell.time);
+                
+                let startStr = startCell.time;
+                let endStr = currentCell.time;
+
+                if (startTimeIdx > endTimeIdx) {
+                    [startStr, endStr] = [endStr, startStr];
+                }
+
+                // 종료 시간은 해당 슬롯의 끝 시간이어야 함 (30분 더하기)
+                // 예: 09:00 슬롯에서 끝났으면 수업은 09:30에 끝나는 것
+                const [eh, em] = endStr.split(':').map(Number);
+                let endDate = new Date(2000, 0, 1, eh, em);
+                endDate.setMinutes(endDate.getMinutes() + 30);
+                const endHour = endDate.getHours().toString().padStart(2, '0');
+                const endMin = endDate.getMinutes().toString().padStart(2, '0');
+                const finalEndStr = `${endHour}:${endMin}`;
+
+                // 모달 열기
+                App.openScheduleModal('create', {
+                    day: startCell.day,
+                    start: startStr,
+                    end: finalEndStr
+                });
+
+                clearSelection();
+                startCell = null;
+                currentCell = null;
+            });
         },
         
         generateTimeSlots: () => {
@@ -1186,6 +1309,29 @@ const Components = {
             
             // 30분 단위로 블록 수 계산
             return Math.ceil(durationMinutes / 30);
+        },
+
+        toggleView: () => {
+            const grid = document.getElementById('schedule-grid');
+            const list = document.getElementById('schedule-list-view');
+            const btn = document.getElementById('view-toggle-btn');
+            
+            if (!grid || !list || !btn) return;
+            
+            const isGridVisible = !grid.classList.contains('hidden');
+            
+            if (isGridVisible) {
+                // Switch to List View
+                grid.classList.add('hidden');
+                list.classList.remove('hidden');
+                Components.Schedule.renderSimpleList('#schedule-list-view');
+                btn.innerHTML = '<i class="ri-grid-line"></i> 시간표로 보기';
+            } else {
+                // Switch to Grid View
+                list.classList.add('hidden');
+                grid.classList.remove('hidden');
+                btn.innerHTML = '<i class="ri-list-check"></i> 리스트로 보기';
+            }
         },
         
         renderList: () => {
@@ -1308,15 +1454,33 @@ const Components = {
                 <div class="schedule-item-left">
                     <div class="schedule-time">${Utils.escapeHtml(start)} - ${Utils.escapeHtml(end)}</div>
                 </div>
-                <div class="schedule-item-right">
+                <div class="schedule-item-center">
                     <div class="schedule-name">${Utils.escapeHtml(schedule.name)}</div>
                     ${schedule.location ? `<div class="schedule-location">📍 ${Utils.escapeHtml(schedule.location)}</div>` : ''}
+                </div>
+                <div class="schedule-item-right">
+                    <button class="btn-delete-item" title="삭제">
+                        <i class="ri-close-line"></i>
+                    </button>
                 </div>
             `;
 
             if (schedule.color) {
                 item.style.borderLeft = `4px solid ${schedule.color}`;
                 item.style.paddingLeft = '12px';
+            }
+
+            // 삭제 버튼 이벤트
+            const deleteBtn = item.querySelector('.btn-delete-item');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm(`'${schedule.name}' 수업을 삭제하시겠습니까?`)) {
+                        ScheduleService.delete(schedule.id);
+                        App.refreshAll();
+                        App.showSuccess('수업이 삭제되었습니다.');
+                    }
+                });
             }
 
             return item;
@@ -1424,23 +1588,72 @@ const Components = {
             
             const assignments = AssignmentService.getSortedByDueDate();
             
+            const emptyStateHTML = `
+                <div class="empty-state-icon">
+                    <i class="ri-task-line"></i>
+                </div>
+                <div class="empty-state-text">등록된 과제가 없습니다</div>
+                <div class="empty-state-sub">새로운 과제를 추가하여 체계적으로 관리해보세요.</div>
+            `;
+            
             Renderer.renderList(list, assignments, (assignment) => {
-                return Renderer.createElement('div', {
-                    className: 'item',
+                const today = new Date();
+                const endDate = new Date(assignment.end);
+                const diff = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+                
+                let dday = '';
+                let ddayClass = 'assignment-dday';
+                if (diff > 0) dday = 'D-' + diff;
+                else if (diff === 0) { dday = 'D-DAY'; ddayClass += ' urgent'; }
+                else { dday = '마감'; ddayClass += ' urgent'; }
+
+                const completedClass = assignment.completed ? ' completed' : '';
+                const checked = assignment.completed ? 'checked' : '';
+
+                const item = Renderer.createElement('div', {
+                    className: `assignment-item${completedClass}`,
                     innerHTML: `
-                        <div>
-                            <strong>${Utils.escapeHtml(assignment.title)}</strong>
-                            <div>
-                                <small>${assignment.classId ? Utils.escapeHtml(assignment.classId) + ' · ' : ''}마감: ${Utils.escapeHtml(assignment.end)}</small>
+                        <div class="assignment-left">
+                            <input type="checkbox" class="assignment-checkbox" ${checked}>
+                        </div>
+                        <div class="assignment-center">
+                            <div class="assignment-title">${Utils.escapeHtml(assignment.title)}</div>
+                            <div class="assignment-meta">
+                                <span class="${ddayClass}">${dday}</span>
+                                <span>${assignment.classId ? Utils.escapeHtml(assignment.classId) + ' · ' : ''}${Utils.escapeHtml(assignment.end)} 까지</span>
                             </div>
                         </div>
-                        <div>
-                            <button onclick="App.viewAssignment('${assignment.id}')">보기</button>
-                            <button onclick="App.deleteAssignment('${assignment.id}')">삭제</button>
+                        <div class="assignment-right">
+                            <button class="btn-icon edit" title="수정">
+                                <i class="ri-edit-line"></i>
+                            </button>
+                            <button class="btn-icon delete" title="삭제">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
                         </div>
                     `
                 });
-            }, '등록된 과제가 없습니다.');
+
+                // 이벤트 리스너 연결
+                const checkbox = item.querySelector('.assignment-checkbox');
+                checkbox.addEventListener('change', (e) => {
+                    App.toggleAssignmentCompletion(assignment.id, e.target.checked);
+                });
+
+                const editBtn = item.querySelector('.btn-icon.edit');
+                editBtn.addEventListener('click', () => {
+                    App.openAssignmentModal('edit', assignment);
+                });
+
+                const deleteBtn = item.querySelector('.btn-icon.delete');
+                deleteBtn.addEventListener('click', () => {
+                    if (confirm(CONFIG.MESSAGES.CONFIRM_DELETE_ASSIGNMENT)) {
+                        App.deleteAssignment(assignment.id);
+                    }
+                });
+
+                return item;
+            }, emptyStateHTML);
         },
         
         renderCalendar: () => {
@@ -1509,8 +1722,11 @@ const Components = {
                 items.slice(0, 2).forEach(a => {
                     const color = a.color || CONFIG.DEFAULT_COLORS.ASSIGNMENT;
                     const title = Utils.escapeHtml(a.title);
-                    html += `<div class="assign-bar" style="background:${color}" title="${title} (마감: ${Utils.escapeHtml(a.end)})" onclick="App.viewAssignment('${a.id}')">` +
-                            `<span class="bar-title">${title}</span>` +
+                    const completedStyle = a.completed ? 'opacity:0.5; text-decoration:line-through;' : '';
+                    const checkMark = a.completed ? '✓ ' : '';
+                    
+                    html += `<div class="assign-bar" style="background:${color}; ${completedStyle}" title="${title} (마감: ${Utils.escapeHtml(a.end)})" onclick="App.viewAssignment('${a.id}')">` +
+                            `<span class="bar-title">${checkMark}${title}</span>` +
                             `</div>`;
                 });
 
@@ -1589,29 +1805,84 @@ const Components = {
     },
     
     Note: {
-        renderList: () => {
-            const list = Utils.qs('#notes-list');
-            if (!list) return;
+        renderList: (filterText = '') => {
+            const grid = Utils.qs('#notes-grid');
+            if (!grid) return;
             
-            const notes = NoteService.getAll();
+            let notes = NoteService.getAll();
             
-            Renderer.renderList(list, notes, (note) => {
-                return Renderer.createElement('div', {
-                    className: 'item',
+            // 검색 필터링
+            if (filterText) {
+                const term = filterText.toLowerCase();
+                notes = notes.filter(n => 
+                    n.title.toLowerCase().includes(term) || 
+                    n.content.toLowerCase().includes(term) ||
+                    (n.classId && n.classId.toLowerCase().includes(term))
+                );
+            }
+            
+            // 최신순 정렬
+            notes.sort((a, b) => new Date(b.created) - new Date(a.created));
+            
+            const emptyStateHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1; padding: 60px 0;">
+                    <div class="empty-state-icon">
+                        <i class="ri-book-2-line"></i>
+                    </div>
+                    <div class="empty-state-text">${filterText ? '검색 결과가 없습니다' : '작성된 노트가 없습니다'}</div>
+                    <div class="empty-state-sub">${filterText ? '다른 키워드로 검색해보세요.' : '수업 내용을 기록하여 나만의 지식 베이스를 만들어보세요.'}</div>
+                </div>
+            `;
+            
+            Renderer.renderList(grid, notes, (note) => {
+                const createdDate = new Date(note.created).toLocaleDateString('ko-KR');
+                const classInfo = note.classId ? `<span class="note-class-badge">${Utils.escapeHtml(note.classId)}</span>` : '';
+                
+                const card = Renderer.createElement('div', {
+                    className: 'note-card',
                     innerHTML: `
-                        <div>
-                            <strong>${Utils.escapeHtml(note.title)}</strong>
-                            <div>
-                                <small>${Utils.escapeHtml(note.classId || '')}</small>
-                            </div>
+                        <div class="note-header">
+                            ${classInfo}
+                            <h3 class="note-title">${Utils.escapeHtml(note.title)}</h3>
                         </div>
-                        <div>
-                            <button onclick="App.viewNote('${note.id}')">보기</button>
-                            <button onclick="App.deleteNote('${note.id}')">삭제</button>
+                        <div class="note-preview">${Utils.escapeHtml(note.content)}</div>
+                        <div class="note-footer">
+                            <span class="note-date">${createdDate}</span>
+                            <div class="note-actions">
+                                <button class="btn-icon edit" title="수정">
+                                    <i class="ri-edit-line"></i>
+                                </button>
+                                <button class="btn-icon delete" title="삭제">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </div>
                         </div>
                     `
                 });
-            }, '저장된 노트가 없습니다.');
+                
+                // 카드 클릭 시 상세 보기 (수정 모달)
+                card.addEventListener('click', (e) => {
+                    // 버튼 클릭 시에는 카드 클릭 이벤트 무시
+                    if (e.target.closest('.btn-icon')) return;
+                    App.openNoteModal('edit', note);
+                });
+                
+                const editBtn = card.querySelector('.btn-icon.edit');
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    App.openNoteModal('edit', note);
+                });
+                
+                const deleteBtn = card.querySelector('.btn-icon.delete');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm(CONFIG.MESSAGES.CONFIRM_DELETE_NOTE)) {
+                        App.deleteNote(note.id);
+                    }
+                });
+                
+                return card;
+            }, emptyStateHTML);
         }
     }
 };
@@ -1802,6 +2073,108 @@ const App = {
         });
     },
     
+    openNoteModal: (mode, note = null) => {
+        const modal = Utils.qs('#note-modal');
+        const form = Utils.qs('#note-modal-form');
+        const titleEl = Utils.qs('#note-modal-title');
+        const modeInput = Utils.qs('#note-modal-mode');
+        const idInput = Utils.qs('#note-modal-id');
+        
+        if (!modal || !form) return;
+        
+        form.reset();
+        modeInput.value = mode;
+        
+        // 수업 목록 채우기
+        const classSelect = Utils.qs('#note-modal-class');
+        if (classSelect) {
+            const schedules = ScheduleService.getAll();
+            classSelect.innerHTML = '<option value="">수업 선택 (선택사항)</option>';
+            // 중복 제거된 수업명 목록
+            const uniqueClasses = [...new Set(schedules.map(s => s.name))];
+            uniqueClasses.forEach(className => {
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                classSelect.appendChild(option);
+            });
+        }
+        
+        if (mode === 'edit' && note) {
+            titleEl.textContent = '노트 수정';
+            idInput.value = note.id;
+            Utils.qs('#note-modal-title').value = note.title; // ID selector fix
+            form.querySelector('#note-modal-title').value = note.title;
+            form.querySelector('#note-modal-content').value = note.content;
+            if (classSelect) classSelect.value = note.classId || '';
+        } else {
+            titleEl.textContent = '새 노트 작성';
+            idInput.value = '';
+        }
+        
+        modal.style.display = 'flex';
+    },
+    
+    handleNoteModalSubmit: (e) => {
+        e.preventDefault();
+        
+        const mode = Utils.qs('#note-modal-mode').value;
+        const id = Utils.qs('#note-modal-id').value;
+        const title = Utils.qs('#note-modal-title').value;
+        const content = Utils.qs('#note-modal-content').value;
+        const classId = Utils.qs('#note-modal-class').value;
+        
+        try {
+            const noteData = {
+                title,
+                content,
+                classId
+            };
+            
+            if (mode === 'edit' && id) {
+                noteData.id = id;
+                // 기존 생성일 유지
+                const oldNote = NoteService.getById(id);
+                if (oldNote) noteData.created = oldNote.created;
+            }
+            
+            NoteService.save(noteData);
+            
+            Utils.qs('#note-modal').style.display = 'none';
+            Components.Note.renderList();
+            Components.Dashboard.render(); // 대시보드 최근 노트 업데이트
+            App.showSuccess(mode === 'create' ? '노트가 작성되었습니다.' : '노트가 수정되었습니다.');
+            
+        } catch (error) {
+            ErrorHandler.logError('노트 저장 실패', error);
+            alert(error.message);
+        }
+    },
+
+    deleteNote: (id) => {
+        if (NoteService.delete(id)) {
+            Components.Note.renderList();
+            Components.Dashboard.render();
+            App.showSuccess('노트가 삭제되었습니다.');
+        } else {
+            App.showError('삭제에 실패했습니다.');
+        }
+    },
+
+    viewNote: (id) => {
+        // 대시보드 등에서 호출될 때 해당 노트 수정 모달 열기
+        const note = NoteService.getById(id);
+        if (note) {
+            // 노트 섹션으로 이동 후 모달 열기
+            const navBtn = document.querySelector('.nav-btn[data-section="notes"]');
+            if (navBtn) navBtn.click();
+            
+            setTimeout(() => {
+                App.openNoteModal('edit', note);
+            }, 100);
+        }
+    },
+
     handleSectionChange: (section) => {
         switch (section) {
             case 'dashboard':
@@ -1810,200 +2183,359 @@ const App = {
                 break;
             case 'assignments':
                 Components.Assignment.renderCalendar();
+                Components.Assignment.renderList();
                 break;
             case 'schedule':
                 Components.Schedule.renderGrid();
+                break;
+            case 'notes':
+                Components.Note.renderList();
                 break;
         }
     },
     
     setupForms: () => {
-        App.setupTimeSelects();
-        
-        const scheduleForm = Utils.qs('#schedule-form');
-        if (scheduleForm) {
-            EventManager.on(scheduleForm, 'submit', App.handleScheduleSubmit);
+        // 과제 추가 버튼 (새로운 디자인)
+        const addAssignmentBtn = Utils.qs('#btn-add-assignment');
+        if (addAssignmentBtn) {
+            EventManager.on(addAssignmentBtn, 'click', () => {
+                App.openAssignmentModal('create');
+            });
         }
-        
-        const assignmentForm = Utils.qs('#assignment-form');
-        if (assignmentForm) {
-            EventManager.on(assignmentForm, 'submit', App.handleAssignmentSubmit);
+
+        // 노트 추가 버튼
+        const addNoteBtn = Utils.qs('#btn-add-note');
+        if (addNoteBtn) {
+            EventManager.on(addNoteBtn, 'click', () => {
+                App.openNoteModal('create');
+            });
         }
-        
-        const noteForm = Utils.qs('#note-form');
-        if (noteForm) {
-            EventManager.on(noteForm, 'submit', App.handleNoteSubmit);
+
+        // 노트 검색
+        const noteSearch = Utils.qs('#note-search');
+        if (noteSearch) {
+            EventManager.on(noteSearch, 'input', (e) => {
+                Components.Note.renderList(e.target.value);
+            });
         }
         
         const clearBtn = Utils.qs('#clear-schedules');
         if (clearBtn) {
             EventManager.on(clearBtn, 'click', App.handleClearSchedules);
         }
-        
-        const editBtn = Utils.qs('#edit-assignments-btn');
-        const editTools = Utils.qs('#edit-tools');
-        if (editBtn && editTools) {
-            EventManager.on(editBtn, 'click', () => {
-                const isVisible = editTools.style.display !== 'none';
-                editTools.style.display = isVisible ? 'none' : 'block';
-                State.ui.editMode = !isVisible;
-                
-                if (State.ui.editMode) {
-                    App.renderEditTools();
-                }
-            });
+
+        const viewToggleBtn = Utils.qs('#view-toggle-btn');
+        if (viewToggleBtn) {
+            EventManager.on(viewToggleBtn, 'click', Components.Schedule.toggleView);
         }
-        
-        // 요일 체크박스 이벤트 설정
-        App.setupDayTimeSelection();
         
         // 시간표 수정 모달 이벤트 설정
         App.setupScheduleEditModal();
-    },
-    
-    setupDayTimeSelection: () => {
-        const dayCheckboxes = Utils.qsa('input[name="class-days"]');
-        let lastSelectedDays = []; // 이전에 선택된 요일들 (추적용으로만 사용)
         
-        // 체크박스 변경 이벤트
-        dayCheckboxes.forEach(checkbox => {
-            EventManager.on(checkbox, 'change', () => {
-                const currentSelectedDays = dayCheckboxes.filter(cb => cb.checked).map(cb => cb.value);
-                lastSelectedDays = [...currentSelectedDays];
-            });
-        });
+        // 과제 수정 모달 이벤트 설정
+        App.setupAssignmentModal();
+
+        // 노트 수정 모달 이벤트 설정
+        App.setupNoteModal();
     },
     
-    setupScheduleEditModal: () => {
-        const modal = Utils.qs('#schedule-edit-modal');
+    setupNoteModal: () => {
+        const modal = Utils.qs('#note-modal');
         const closeBtn = modal?.querySelector('.modal-close');
         const cancelBtn = modal?.querySelector('.btn-cancel');
-        const form = Utils.qs('#schedule-edit-form');
+        const form = Utils.qs('#note-modal-form');
         
-        if (closeBtn) {
-            EventManager.on(closeBtn, 'click', () => {
-                App.closeScheduleEditModal();
-            });
-        }
-        
-        if (cancelBtn) {
-            EventManager.on(cancelBtn, 'click', () => {
-                App.closeScheduleEditModal();
-            });
-        }
+        const closeModal = () => {
+            if (modal) modal.style.display = 'none';
+        };
+
+        if (closeBtn) EventManager.on(closeBtn, 'click', closeModal);
+        if (cancelBtn) EventManager.on(cancelBtn, 'click', closeModal);
         
         if (form) {
-            EventManager.on(form, 'submit', App.handleScheduleEditSubmit);
+            EventManager.on(form, 'submit', App.handleNoteModalSubmit);
+        }
+        
+        if (modal) {
+            EventManager.on(modal, 'click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+    },
+
+    setupAssignmentModal: () => {
+        const modal = Utils.qs('#assignment-modal');
+        const closeBtn = modal?.querySelector('.modal-close');
+        const cancelBtn = modal?.querySelector('.btn-cancel');
+        const form = Utils.qs('#assignment-modal-form');
+        
+        const closeModal = () => {
+            if (modal) modal.style.display = 'none';
+        };
+
+        if (closeBtn) EventManager.on(closeBtn, 'click', closeModal);
+        if (cancelBtn) EventManager.on(cancelBtn, 'click', closeModal);
+        
+        if (form) {
+            EventManager.on(form, 'submit', App.handleAssignmentModalSubmit);
+        }
+        
+        if (modal) {
+            EventManager.on(modal, 'click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+    },
+
+    setupScheduleEditModal: () => {
+        // 기존 schedule-edit-modal -> schedule-modal (공용)
+        const modal = Utils.qs('#schedule-modal');
+        const closeBtn = modal?.querySelector('.modal-close');
+        const cancelBtn = modal?.querySelector('.btn-cancel');
+        const form = Utils.qs('#schedule-modal-form');
+        
+        const closeModal = () => {
+            if (modal) modal.style.display = 'none';
+        };
+
+        if (closeBtn) EventManager.on(closeBtn, 'click', closeModal);
+        if (cancelBtn) EventManager.on(cancelBtn, 'click', closeModal);
+        
+        if (form) {
+            EventManager.on(form, 'submit', App.handleScheduleModalSubmit);
         }
         
         // 모달 배경 클릭으로 닫기
         if (modal) {
             EventManager.on(modal, 'click', (e) => {
-                if (e.target === modal) {
-                    App.closeScheduleEditModal();
-                }
+                if (e.target === modal) closeModal();
             });
         }
-    },
-    
-    setupTimeSelects: () => {
-        const startHour = Utils.qs('#start-hour');
-        const startMin = Utils.qs('#start-min');
-        const endHour = Utils.qs('#end-hour');
-        const endMin = Utils.qs('#end-min');
-        const startTime = Utils.qs('#start-time');
-        const endTime = Utils.qs('#end-time');
-        
-        const updateStartTime = () => {
-            if (startHour && startMin && startTime) {
-                startTime.value = `${startHour.value}:${startMin.value}`;
+
+        // 시간 선택 옵션 채우기 (07:00 ~ 20:30)
+        const hours = [];
+        for(let i=7; i<=20; i++) hours.push(i.toString().padStart(2,'0'));
+        const mins = ['00', '30'];
+
+        const selects = ['modal-start-hour', 'modal-end-hour'];
+        selects.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.innerHTML = hours.map(h => `<option value="${h}">${h}</option>`).join('');
             }
-        };
-        
-        const updateEndTime = () => {
-            if (endHour && endMin && endTime) {
-                endTime.value = `${endHour.value}:${endMin.value}`;
+        });
+        const minSelects = ['modal-start-min', 'modal-end-min'];
+        minSelects.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.innerHTML = mins.map(m => `<option value="${m}">${m}</option>`).join('');
             }
-        };
-        
-        if (startHour && startMin) {
-            EventManager.on(startHour, 'change', updateStartTime);
-            EventManager.on(startMin, 'change', updateStartTime);
-            updateStartTime();
-        }
-        
-        if (endHour && endMin) {
-            EventManager.on(endHour, 'change', updateEndTime);
-            EventManager.on(endMin, 'change', updateEndTime);
-            updateEndTime();
-        }
+        });
     },
-    
-    handleScheduleSubmit: (e) => {
+
+    handleScheduleModalSubmit: (e) => {
         e.preventDefault();
-        
+        const mode = document.getElementById('modal-mode').value; // create or edit
+        const id = document.getElementById('modal-schedule-id').value;
+        const name = document.getElementById('modal-class-name').value;
+        const location = document.getElementById('modal-location').value;
+        const day = document.getElementById('modal-day').value;
+        const color = document.getElementById('modal-class-color').value;
+
+        const startHour = document.getElementById('modal-start-hour').value;
+        const startMin = document.getElementById('modal-start-min').value;
+        const endHour = document.getElementById('modal-end-hour').value;
+        const endMin = document.getElementById('modal-end-min').value;
+
+        const start = `${startHour}:${startMin}`;
+        const end = `${endHour}:${endMin}`;
+
+        // 유효성 검사
+        if (!name) { alert('수업명을 입력해주세요.'); return; }
+        if (start >= end) { alert('종료 시간은 시작 시간보다 늦어야 합니다.'); return; }
+
         try {
-            const className = Utils.qs('#class-name')?.value?.trim();
-            const location = Utils.qs('#location')?.value?.trim();
-            const color = Utils.qs('#class-color')?.value || CONFIG.DEFAULT_COLORS.SCHEDULE;
-            
-            if (!className) {
-                throw new Error('수업명을 입력해주세요.');
-            }
-            
-            // 선택된 요일들 가져오기
-            const selectedDays = Array.from(document.querySelectorAll('input[name="class-days"]:checked'))
-                .map(cb => cb.value);
-            
-            if (selectedDays.length === 0) {
-                throw new Error('요일을 선택해주세요.');
-            }
-            
-            // 현재 입력된 시간 가져오기
-            const startHour = Utils.qs('#start-hour')?.value || '07';
-            const startMin = Utils.qs('#start-min')?.value || '00';
-            const endHour = Utils.qs('#end-hour')?.value || '08';
-            const endMin = Utils.qs('#end-min')?.value || '00';
-            
-            const startTime = `${startHour}:${startMin}`;
-            const endTime = `${endHour}:${endMin}`;
-            
-            // 시간 중복 검사
-            for (const day of selectedDays) {
-                const conflicts = ScheduleService.checkConflicts(day, startTime, endTime);
-                if (conflicts.length > 0) {
-                    throw new Error(`${day}요일 ${startTime}-${endTime} 시간에 이미 '${conflicts[0].name}' 수업이 있습니다.`);
-                }
-            }
-            
-            // 모든 선택된 요일에 동일한 시간으로 스케줄 저장
-            const savedSchedules = [];
-            for (const day of selectedDays) {
-                const formData = {
-                    name: className,
-                    location: location,
-                    color: color,
-                    day: day,
-                    start: startTime,
-                    end: endTime
-                };
+            if (mode === 'edit') {
+                // 수정 로직
+                const schedule = ScheduleService.getById(id);
+                if (!schedule) throw new Error('수정할 스케줄을 찾을 수 없습니다.');
                 
-                const schedule = ScheduleService.save(formData);
-                savedSchedules.push(schedule);
-            }
-            
-            // 체크박스만 해제 (수업명, 장소, 시간은 유지)
-            document.querySelectorAll('input[name="class-days"]').forEach(cb => cb.checked = false);
-            
-            App.refreshAll();
-            
-            if (savedSchedules.length === 1) {
-                App.showSuccess(`'${savedSchedules[0].name}' 수업이 ${selectedDays[0]}요일에 추가되었습니다.`);
+                // 시간 충돌 검사 (자기 자신 제외)
+                const conflicts = ScheduleService.checkConflicts(day, start, end, id);
+                if (conflicts.length > 0) {
+                    throw new Error(`시간이 겹치는 수업이 있습니다: ${conflicts[0].name}`);
+                }
+
+                schedule.name = name;
+                schedule.location = location;
+                schedule.day = day;
+                schedule.start = start;
+                schedule.end = end;
+                schedule.color = color;
+
+                ScheduleService.save(schedule); // save handles update if ID exists
+                App.showSuccess('수업이 수정되었습니다.');
             } else {
-                App.showSuccess(`'${savedSchedules[0].name}' 수업이 ${savedSchedules.length}개 요일에 추가되었습니다.`);
+                // 추가 로직
+                const conflicts = ScheduleService.checkConflicts(day, start, end);
+                if (conflicts.length > 0) {
+                    throw new Error(`시간이 겹치는 수업이 있습니다: ${conflicts[0].name}`);
+                }
+
+                ScheduleService.save({
+                    name, location, day, start, end, color
+                });
+                App.showSuccess('새 수업이 추가되었습니다.');
+            }
+
+            document.getElementById('schedule-modal').style.display = 'none';
+            App.refreshAll();
+
+        } catch (err) {
+            App.showError(err.message);
+        }
+    },
+
+    openScheduleModal: (mode, data = {}) => {
+        const modal = document.getElementById('schedule-modal');
+        if (!modal) return;
+
+        document.getElementById('modal-mode').value = mode;
+        document.getElementById('modal-title').textContent = mode === 'edit' ? '수업 수정' : '새 수업 추가';
+        
+        // 초기화
+        if (mode === 'create') {
+            document.getElementById('modal-schedule-id').value = '';
+            document.getElementById('modal-class-name').value = '';
+            document.getElementById('modal-location').value = '';
+            document.getElementById('modal-class-color').value = CONFIG.DEFAULT_COLORS.SCHEDULE;
+            
+            // 전달받은 데이터(드래그 등)가 있으면 세팅
+            if (data.day) document.getElementById('modal-day').value = data.day;
+            if (data.start) {
+                const [h, m] = data.start.split(':');
+                document.getElementById('modal-start-hour').value = h;
+                document.getElementById('modal-start-min').value = m;
+            }
+            if (data.end) {
+                const [h, m] = data.end.split(':');
+                document.getElementById('modal-end-hour').value = h;
+                document.getElementById('modal-end-min').value = m;
+            }
+        } else {
+            // edit
+            document.getElementById('modal-schedule-id').value = data.id;
+            document.getElementById('modal-class-name').value = data.name;
+            document.getElementById('modal-location').value = data.location || '';
+            document.getElementById('modal-day').value = data.day;
+            document.getElementById('modal-class-color').value = data.color;
+            
+            const [sh, sm] = data.start.split(':');
+            const [eh, em] = data.end.split(':');
+            document.getElementById('modal-start-hour').value = sh;
+            document.getElementById('modal-start-min').value = sm;
+            document.getElementById('modal-end-hour').value = eh;
+            document.getElementById('modal-end-min').value = em;
+        }
+
+        modal.style.display = 'flex';
+    },
+
+    // 기존 editSchedule 함수 대체
+    editSchedule: (id) => {
+        const schedule = ScheduleService.getById(id);
+        if (schedule) {
+            App.openScheduleModal('edit', schedule);
+        }
+    },
+
+    openAssignmentModal: (mode, data = {}) => {
+        const modal = document.getElementById('assignment-modal');
+        if (!modal) return;
+
+        document.getElementById('assignment-modal-mode').value = mode;
+        document.getElementById('assignment-modal-title').textContent = mode === 'edit' ? '과제 수정' : '새 과제 추가';
+        
+        // 수업 목록 채우기
+        const classSelect = document.getElementById('assignment-modal-class');
+        classSelect.innerHTML = '<option value="">수업 선택 (선택사항)</option>';
+        ScheduleService.getAll().forEach(s => {
+            const option = document.createElement('option');
+            option.value = s.name; // ID 대신 이름 사용 (기존 로직 유지)
+            option.textContent = s.name;
+            classSelect.appendChild(option);
+        });
+
+        if (mode === 'create') {
+            document.getElementById('assignment-modal-id').value = '';
+            document.getElementById('assignment-modal-title').value = '';
+            document.getElementById('assignment-modal-class').value = '';
+            document.getElementById('assignment-modal-start').value = Utils.formatDate(new Date());
+            document.getElementById('assignment-modal-end').value = Utils.formatDate(new Date());
+            document.getElementById('assignment-modal-color').value = CONFIG.DEFAULT_COLORS.ASSIGNMENT;
+            document.getElementById('assignment-modal-notes').value = '';
+        } else {
+            document.getElementById('assignment-modal-id').value = data.id;
+            document.getElementById('assignment-modal-title').value = data.title;
+            document.getElementById('assignment-modal-class').value = data.classId || '';
+            document.getElementById('assignment-modal-start').value = data.start;
+            document.getElementById('assignment-modal-end').value = data.end;
+            document.getElementById('assignment-modal-color').value = data.color;
+            document.getElementById('assignment-modal-notes').value = data.notes || '';
+        }
+
+        modal.style.display = 'flex';
+    },
+
+    handleAssignmentModalSubmit: (e) => {
+        e.preventDefault();
+        const mode = document.getElementById('assignment-modal-mode').value;
+        const id = document.getElementById('assignment-modal-id').value;
+        
+        const formData = {
+            title: document.getElementById('assignment-modal-title').value.trim(),
+            classId: document.getElementById('assignment-modal-class').value,
+            start: document.getElementById('assignment-modal-start').value,
+            end: document.getElementById('assignment-modal-end').value,
+            color: document.getElementById('assignment-modal-color').value,
+            notes: document.getElementById('assignment-modal-notes').value.trim()
+        };
+
+        if (!formData.title) {
+            alert('과제 제목을 입력해주세요.');
+            return;
+        }
+
+        try {
+            if (mode === 'edit') {
+                const assignment = AssignmentService.getById(id);
+                if (!assignment) throw new Error('수정할 과제를 찾을 수 없습니다.');
+                
+                Object.assign(assignment, formData);
+                AssignmentService.save(assignment);
+                App.showSuccess('과제가 수정되었습니다.');
+            } else {
+                AssignmentService.save(formData);
+                App.showSuccess('새 과제가 추가되었습니다.');
+            }
+
+            document.getElementById('assignment-modal').style.display = 'none';
+            App.refreshAll();
+        } catch (err) {
+            App.showError(err.message);
+        }
+    },
+
+    toggleAssignmentCompletion: (id, isCompleted) => {
+        try {
+            const assignment = AssignmentService.getById(id);
+            if (assignment) {
+                assignment.completed = isCompleted;
+                AssignmentService.save(assignment);
+                App.refreshAll();
             }
         } catch (error) {
-            App.showError(error.message);
+            console.error('상태 변경 실패:', error);
         }
     },
     
@@ -2070,6 +2602,7 @@ const App = {
             Components.Schedule.renderList();
             Components.Schedule.renderCards();
             Components.Schedule.renderScheduleManager();
+            Components.Schedule.renderSimpleList('#schedule-list-view'); // 리스트 뷰 업데이트 추가
             Components.Assignment.renderList();
             Components.Assignment.renderCalendar();
             Components.Note.renderList();
@@ -2164,7 +2697,7 @@ const App = {
         try {
             const assignment = AssignmentService.getById(id);
             if (assignment) {
-                alert(`${assignment.title}\n수업: ${assignment.classId || '-'}\n마감: ${assignment.end}\n\n${assignment.notes || ''}`);
+                App.openAssignmentModal('edit', assignment);
             }
         } catch (error) {
             App.showError('과제 정보를 불러올 수 없습니다.');
