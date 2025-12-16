@@ -1,4 +1,15 @@
 /**
+ * School Life Helper - Main Application Logic
+ * 
+ * @version 2.0.0
+ * @description Modularized JavaScript for managing schedules, assignments, and notes.
+ * Includes local storage management, UI rendering, and event handling.
+ * 
+ * @author School Life Helper Team
+ * @copyright 2024 School Life Helper
+ */
+
+/**
  * 학교생활 관리 시스템 - 모듈형 아키텍처 (수정된 버전)
  * 가독성, 확장성, 유지보수성을 고려한 구조 개선
  */
@@ -476,6 +487,71 @@ const NoteService = {
     delete: (id) => {
         const notes = NoteService.getAll().filter(n => n.id !== id);
         return LocalStorageUtil.write(CONFIG.STORAGE_KEYS.NOTES, notes.map(n => n.toJSON()));
+    }
+};
+
+// ===== 백업 및 복구 서비스 =====
+const BackupService = {
+    export: () => {
+        try {
+            const data = {
+                schedules: LocalStorageUtil.read(CONFIG.STORAGE_KEYS.SCHEDULE),
+                assignments: LocalStorageUtil.read(CONFIG.STORAGE_KEYS.ASSIGNMENTS),
+                notes: LocalStorageUtil.read(CONFIG.STORAGE_KEYS.NOTES),
+                savedSchedules: LocalStorageUtil.read(CONFIG.STORAGE_KEYS.SAVED_SCHEDULES),
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `school-life-backup-${Utils.formatDate(new Date())}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            return true;
+        } catch (error) {
+            console.error('Backup export failed:', error);
+            return false;
+        }
+    },
+    
+    import: (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Simple validation
+                    if (!data.timestamp) {
+                        throw new Error('유효하지 않은 백업 파일입니다.');
+                    }
+                    
+                    LocalStorageUtil.write(CONFIG.STORAGE_KEYS.SCHEDULE, data.schedules || []);
+                    LocalStorageUtil.write(CONFIG.STORAGE_KEYS.ASSIGNMENTS, data.assignments || []);
+                    LocalStorageUtil.write(CONFIG.STORAGE_KEYS.NOTES, data.notes || []);
+                    LocalStorageUtil.write(CONFIG.STORAGE_KEYS.SAVED_SCHEDULES, data.savedSchedules || []);
+                    
+                    resolve(true);
+                } catch (err) {
+                    reject(err);
+                }
+            };
+            reader.onerror = () => reject(new Error('파일 읽기 실패'));
+            reader.readAsText(file);
+        });
+    },
+    
+    resetAll: () => {
+        LocalStorageUtil.clear(CONFIG.STORAGE_KEYS.SCHEDULE);
+        LocalStorageUtil.clear(CONFIG.STORAGE_KEYS.ASSIGNMENTS);
+        LocalStorageUtil.clear(CONFIG.STORAGE_KEYS.NOTES);
+        LocalStorageUtil.clear(CONFIG.STORAGE_KEYS.SAVED_SCHEDULES);
+        return true;
     }
 };
 
@@ -1930,52 +2006,16 @@ const ErrorHandler = {
     }
 };
 
-// ===== 테마 관리 모듈 =====
-const ThemeManager = {
-    init: () => {
-        const toggleBtn = document.getElementById('btn-theme-toggle');
-        const icon = toggleBtn?.querySelector('i');
-        
-        // 저장된 테마 불러오기
-        const savedTheme = localStorage.getItem('sl_theme');
-        const isDark = savedTheme === 'dark';
-        
-        // 초기 상태 적용
-        if (isDark) {
-            document.body.classList.add('dark-mode');
-            if (icon) icon.className = 'ri-sun-line';
-        }
-        
-        // 토글 이벤트 연결
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                const isDarkMode = document.body.classList.contains('dark-mode');
-                
-                // 아이콘 변경
-                if (icon) {
-                    icon.className = isDarkMode ? 'ri-sun-line' : 'ri-moon-line';
-                }
-                
-                // 설정 저장
-                localStorage.setItem('sl_theme', isDarkMode ? 'dark' : 'light');
-            });
-        }
-    }
-};
-
 // ===== 메인 애플리케이션 객체 =====
 const App = {
     init: () => {
         try {
-            ThemeManager.init(); // 테마 매니저 초기화
             App.setupNavigation();
             App.setupForms();
+            App.setupSettingsModal(); // 설정 모달 초기화
             Components.Dashboard.setupScheduleSetSelector();
             App.initDemoData();
             App.refreshAll();
-            
-            console.log('📚 학교생활 관리 시스템이 성공적으로 초기화되었습니다.');
         } catch (error) {
             console.error('앱 초기화 중 오류 발생:', error);
             App.showError('시스템 초기화에 실패했습니다. 페이지를 새로고침해 주세요.');
@@ -2037,11 +2077,9 @@ const App = {
         // Hero 버튼 동작: 시작하기 / 더 알아보기
         const btnGetStarted = document.getElementById('btn-get-started');
         if (btnGetStarted) {
-            console.log('✅ 시작하기 버튼 이벤트 연결 성공');
             EventManager.on(btnGetStarted, 'click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('🚀 시작하기 버튼 클릭됨!');
                 
                 // 대시보드 섹션 표시
                 navBtns.forEach(b => b.classList.remove('active'));
@@ -2059,21 +2097,16 @@ const App = {
                 
                 // 튜토리얼 시작 (스크롤 완료 대기)
                 setTimeout(() => {
-                    console.log('📚 튜토리얼 시작!');
                     Tutorial.start();
                 }, 1000);
             });
-        } else {
-            console.error('❌ 시작하기 버튼을 찾을 수 없음!');
         }
 
         const btnLearnMore = document.getElementById('btn-learn-more');
         if (btnLearnMore) {
-            console.log('✅ 더 알아보기 버튼 이벤트 연결 성공');
             EventManager.on(btnLearnMore, 'click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('📖 더 알아보기 버튼 클릭됨!');
                 
                 // 대시보드 섹션 표시
                 navBtns.forEach(b => b.classList.remove('active'));
@@ -2091,12 +2124,9 @@ const App = {
                 
                 // 소개용 튜토리얼 시작 (스크롤 완료 대기)
                 setTimeout(() => {
-                    console.log('📚 소개 튜토리얼 시작!');
                     Tutorial.startLearnMore();
                 }, 1000);
             });
-        } else {
-            console.error('❌ 더 알아보기 버튼을 찾을 수 없음!');
         }
 
         // Footer Navigation Setup
@@ -2274,13 +2304,7 @@ const App = {
         }
 
         // 노트 추가 버튼 (HTML onclick 속성으로 대체됨)
-        // const addNoteBtn = Utils.qs('#btn-add-note');
-        // if (addNoteBtn) {
-        //     EventManager.on(addNoteBtn, 'click', () => {
-        //         console.log('New Note button clicked');
-        //         App.openNoteModal('create');
-        //     });
-        // }
+
 
         // 노트 검색
         const noteSearch = Utils.qs('#note-search');
@@ -2330,6 +2354,84 @@ const App = {
         if (modal) {
             EventManager.on(modal, 'click', (e) => {
                 if (e.target === modal) closeModal();
+            });
+        }
+    },
+
+    setupSettingsModal: () => {
+        const modal = Utils.qs('#settings-modal');
+        const btnProfile = Utils.qs('#btn-profile');
+        const closeBtn = modal?.querySelector('.modal-close');
+        
+        const openModal = () => {
+            if (modal) modal.style.display = 'flex';
+        };
+        
+        const closeModal = () => {
+            if (modal) modal.style.display = 'none';
+        };
+
+        if (btnProfile) EventManager.on(btnProfile, 'click', openModal);
+        if (closeBtn) EventManager.on(closeBtn, 'click', closeModal);
+        
+        if (modal) {
+            EventManager.on(modal, 'click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+
+        // 백업 (내보내기)
+        const btnExport = Utils.qs('#btn-backup-export');
+        if (btnExport) {
+            EventManager.on(btnExport, 'click', () => {
+                if (BackupService.export()) {
+                    App.showSuccess('데이터 백업 파일이 다운로드되었습니다.');
+                } else {
+                    App.showError('백업 파일 생성에 실패했습니다.');
+                }
+            });
+        }
+
+        // 복구 (불러오기)
+        const btnImportTrigger = Utils.qs('#btn-backup-import-trigger');
+        const fileInput = Utils.qs('#backup-file-input');
+        
+        if (btnImportTrigger && fileInput) {
+            EventManager.on(btnImportTrigger, 'click', () => {
+                fileInput.click();
+            });
+            
+            EventManager.on(fileInput, 'change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    const success = await BackupService.import(file);
+                    if (success) {
+                        App.showSuccess('데이터가 성공적으로 복구되었습니다.');
+                        App.refreshAll();
+                        closeModal();
+                    }
+                } catch (error) {
+                    App.showError('데이터 복구 실패: ' + error.message);
+                }
+                
+                // Reset input
+                fileInput.value = '';
+            });
+        }
+
+        // 초기화
+        const btnReset = Utils.qs('#btn-reset-all');
+        if (btnReset) {
+            EventManager.on(btnReset, 'click', () => {
+                if (confirm('정말로 모든 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
+                    if (BackupService.resetAll()) {
+                        App.showSuccess('모든 데이터가 초기화되었습니다.');
+                        App.refreshAll();
+                        closeModal();
+                    }
+                }
             });
         }
     },
@@ -2934,7 +3036,7 @@ const App = {
     },
     
     showSuccess: (message) => {
-        console.log('✅', message);
+        // 사용자 피드백 (필요시 토스트 메시지 구현)
     },
     
     showError: (message) => {
