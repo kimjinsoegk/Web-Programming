@@ -1930,10 +1930,45 @@ const ErrorHandler = {
     }
 };
 
+// ===== 테마 관리 모듈 =====
+const ThemeManager = {
+    init: () => {
+        const toggleBtn = document.getElementById('btn-theme-toggle');
+        const icon = toggleBtn?.querySelector('i');
+        
+        // 저장된 테마 불러오기
+        const savedTheme = localStorage.getItem('sl_theme');
+        const isDark = savedTheme === 'dark';
+        
+        // 초기 상태 적용
+        if (isDark) {
+            document.body.classList.add('dark-mode');
+            if (icon) icon.className = 'ri-sun-line';
+        }
+        
+        // 토글 이벤트 연결
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                
+                // 아이콘 변경
+                if (icon) {
+                    icon.className = isDarkMode ? 'ri-sun-line' : 'ri-moon-line';
+                }
+                
+                // 설정 저장
+                localStorage.setItem('sl_theme', isDarkMode ? 'dark' : 'light');
+            });
+        }
+    }
+};
+
 // ===== 메인 애플리케이션 객체 =====
 const App = {
     init: () => {
         try {
+            ThemeManager.init(); // 테마 매니저 초기화
             App.setupNavigation();
             App.setupForms();
             Components.Dashboard.setupScheduleSetSelector();
