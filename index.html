@@ -370,12 +370,12 @@
                         <input type="hidden" id="note-modal-id">
                         
                         <div class="modal-row" style="margin-bottom: 12px;">
-                            <select id="note-modal-class" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border);" required>
+                            <select id="note-modal-class" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border);">
                                 <option value="">수업 선택</option>
                             </select>
                         </div>
 
-                        <input type="text" id="note-modal-title" placeholder="노트 제목" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px; font-weight: 600;" required>
+                        <input type="text" id="note-input-title" placeholder="노트 제목" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px; font-weight: 600;" required>
                         
                         <textarea id="note-modal-content" placeholder="내용을 입력하세요..." style="width:100%; height:300px; padding:12px; border:1px solid var(--border); border-radius:8px; resize: vertical; line-height: 1.6;" required></textarea>
                         
@@ -396,15 +396,15 @@
                         <i class="ri-search-line"></i>
                         <input type="text" id="note-search" placeholder="노트 검색...">
                     </div>
-                    <button id="btn-add-note" class="btn-primary">
+                    <button id="btn-add-note" class="btn-primary" onclick="App.openNoteModal('create')">
                         <i class="ri-add-line"></i> 새 노트 작성
                     </button>
                 </div>
             </div>
 
             <!-- 노트 필터/태그 영역 (추후 확장 가능) -->
-            <div class="notes-filter-bar" style="margin-bottom: 20px; display: none;">
-                <button class="filter-chip active">전체</button>
+            <div class="notes-filter-bar" id="notes-filter-bar" style="margin-bottom: 20px; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;">
+                <button class="filter-chip active" data-filter="all">전체</button>
                 <!-- JS로 수업별 필터 생성 -->
             </div>
 

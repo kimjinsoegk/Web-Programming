@@ -3508,6 +3508,12 @@ button.success:hover {
 .search-box {
     position: relative;
     width: 240px;
+    transition: width 0.2s ease;
+}
+
+/* 검색창 포커스 시 컨테이너 확장 (버튼 밀어내기) */
+.search-box:focus-within {
+    width: 280px;
 }
 
 .search-box i {
@@ -3517,6 +3523,7 @@ button.success:hover {
     transform: translateY(-50%);
     color: var(--text-light);
     font-size: 16px;
+    pointer-events: none;
 }
 
 .search-box input {
@@ -3533,7 +3540,6 @@ button.success:hover {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px var(--primary-light);
-    width: 280px;
 }
 
 /* ���� Ĩ ��Ÿ�� */

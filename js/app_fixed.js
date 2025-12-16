@@ -82,7 +82,8 @@ const LocalStorageUtil = {
 const State = {
     ui: {
         activeSection: 'dashboard',
-        editMode: false
+        editMode: false,
+        noteFilter: 'all'
     },
     pendingSchedules: [] // 임시 저장된 스케줄들
 };
@@ -123,7 +124,8 @@ const Validator = {
     
     note: (data) => {
         const errors = [];
-        if (!data.classId) errors.push('수업을 선택해주세요.');
+        // 수업 선택은 선택사항으로 변경
+        // if (!data.classId) errors.push('수업을 선택해주세요.');
         if (!data.title?.trim()) errors.push('노트 제목은 필수입니다.');
         if (!data.content?.trim()) errors.push('내용을 입력해주세요.');
         return errors;
@@ -1805,13 +1807,46 @@ const Components = {
     },
     
     Note: {
+        renderFilterBar: () => {
+            const container = Utils.qs('#notes-filter-bar');
+            if (!container) return;
+            
+            const notes = NoteService.getAll();
+            // Get unique class IDs from notes
+            const classes = [...new Set(notes.map(n => n.classId).filter(Boolean))];
+            
+            let html = `<button class="filter-chip ${State.ui.noteFilter === 'all' ? 'active' : ''}" data-filter="all">전체</button>`;
+            
+            classes.forEach(cls => {
+                const isActive = State.ui.noteFilter === cls;
+                html += `<button class="filter-chip ${isActive ? 'active' : ''}" data-filter="${Utils.escapeHtml(cls)}">${Utils.escapeHtml(cls)}</button>`;
+            });
+            
+            container.innerHTML = html;
+            
+            // Add event listeners
+            container.querySelectorAll('.filter-chip').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filter = btn.dataset.filter;
+                    State.ui.noteFilter = filter;
+                    Components.Note.renderFilterBar(); // Re-render to update active state
+                    Components.Note.renderList();
+                });
+            });
+        },
+
         renderList: (filterText = '') => {
             const grid = Utils.qs('#notes-grid');
             if (!grid) return;
             
             let notes = NoteService.getAll();
             
-            // 검색 필터링
+            // 1. 카테고리 필터링
+            if (State.ui.noteFilter && State.ui.noteFilter !== 'all') {
+                notes = notes.filter(n => n.classId === State.ui.noteFilter);
+            }
+
+            // 2. 검색 필터링
             if (filterText) {
                 const term = filterText.toLowerCase();
                 notes = notes.filter(n => 
@@ -2076,9 +2111,10 @@ const App = {
     openNoteModal: (mode, note = null) => {
         const modal = Utils.qs('#note-modal');
         const form = Utils.qs('#note-modal-form');
-        const titleEl = Utils.qs('#note-modal-title');
+        const titleEl = Utils.qs('#note-modal-title'); // Header title (h3)
         const modeInput = Utils.qs('#note-modal-mode');
         const idInput = Utils.qs('#note-modal-id');
+        const titleInput = Utils.qs('#note-input-title'); // Form input
         
         if (!modal || !form) return;
         
@@ -2103,8 +2139,7 @@ const App = {
         if (mode === 'edit' && note) {
             titleEl.textContent = '노트 수정';
             idInput.value = note.id;
-            Utils.qs('#note-modal-title').value = note.title; // ID selector fix
-            form.querySelector('#note-modal-title').value = note.title;
+            if (titleInput) titleInput.value = note.title;
             form.querySelector('#note-modal-content').value = note.content;
             if (classSelect) classSelect.value = note.classId || '';
         } else {
@@ -2120,7 +2155,7 @@ const App = {
         
         const mode = Utils.qs('#note-modal-mode').value;
         const id = Utils.qs('#note-modal-id').value;
-        const title = Utils.qs('#note-modal-title').value;
+        const title = Utils.qs('#note-input-title').value;
         const content = Utils.qs('#note-modal-content').value;
         const classId = Utils.qs('#note-modal-class').value;
         
@@ -2203,13 +2238,14 @@ const App = {
             });
         }
 
-        // 노트 추가 버튼
-        const addNoteBtn = Utils.qs('#btn-add-note');
-        if (addNoteBtn) {
-            EventManager.on(addNoteBtn, 'click', () => {
-                App.openNoteModal('create');
-            });
-        }
+        // 노트 추가 버튼 (HTML onclick 속성으로 대체됨)
+        // const addNoteBtn = Utils.qs('#btn-add-note');
+        // if (addNoteBtn) {
+        //     EventManager.on(addNoteBtn, 'click', () => {
+        //         console.log('New Note button clicked');
+        //         App.openNoteModal('create');
+        //     });
+        // }
 
         // 노트 검색
         const noteSearch = Utils.qs('#note-search');
@@ -2605,6 +2641,7 @@ const App = {
             Components.Schedule.renderSimpleList('#schedule-list-view'); // 리스트 뷰 업데이트 추가
             Components.Assignment.renderList();
             Components.Assignment.renderCalendar();
+            Components.Note.renderFilterBar(); // 필터 바 렌더링 추가
             Components.Note.renderList();
             Components.Schedule.populateSelects();
             // 홈 시간표 최신화
