@@ -18,11 +18,6 @@ export const Tutorial = (() => {
             targetSelector: '.feature-card[data-target="notes"]',
             title: '필기 노트',
             body: '수업별로 필기를 정리하고, 나중에 다시 복습하기 좋아요.'
-        },
-        {
-            targetSelector: '.feature-card[data-target="club"]',
-            title: '클럽 활동',
-            body: '동아리 일정과 공지를 관리할 수 있는 기능으로, 곧 준비될 예정이에요.'
         }
     ];
 
