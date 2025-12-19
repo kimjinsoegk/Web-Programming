@@ -1295,3 +1295,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 초기 시간표 렌더링
     renderDashboardScheduleTable();
 });
+
+// 앱 초기화 실행
+document.addEventListener('DOMContentLoaded', () => {
+    App.init();
+});

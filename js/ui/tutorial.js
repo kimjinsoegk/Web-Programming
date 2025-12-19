@@ -1,6 +1,4 @@
-import { State } from '../app.js'; // Circular dependency warning: State is in app.js. 
-// Better to move State to a separate file or pass it as argument.
-// For now, I will assume State is available globally or I will move State to core/state.js
+import { State } from '../core/state.js';
 
 export const Tutorial = (() => {
     const STEPS = [
